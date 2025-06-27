@@ -1,1 +1,1 @@
-# lgup6-2nd-project
+# pick-your-place
