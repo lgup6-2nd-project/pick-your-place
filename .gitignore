@@ -193,6 +193,6 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
-# added file
-data/
+# added
+*.csv
 db/
