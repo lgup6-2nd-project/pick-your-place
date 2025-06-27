@@ -45,3 +45,40 @@
 ├── requirements.txt
 └── README.md
 ```
+
+---
+
+## 브랜치 생성, 수정, 병합
+
+1. 브랜치 생성
+```bash
+git checkout dev # 브랜치 이동
+git pull origin dev
+git checkout -b feature/mh-api
+```
+
+2. 개발
+
+3. Git에 push
+```bash
+git add .
+git commit -m "[feature] API 연동"
+git push origin feature/mh-api
+```
+
+4. GitHub에서 PR -> dev로 merge
+
+5. 로컬 최신화(선택)
+```bash
+git checkout dev
+git pull origin dev
+```
+
+6. 브랜치 정리
+```bash
+git branch -d feature/my-api
+git push origin --delete feature/mh-api
+```
+
+---
+
