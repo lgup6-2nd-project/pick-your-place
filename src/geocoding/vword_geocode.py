@@ -66,12 +66,12 @@ def coordinates_to_jibun_address(longitude: float, latitude: float) -> str:
         print(f"[예외 발생 - 좌표→지번주소] {e}")
         return None
 
-# 순서 : 경도 위도
-# 1. 도로명 주소 → 좌표
-lon, lat = road_address_to_coordinates("서울특별시 종로구 율곡로 283")
-print("좌표:", lon, lat)
+# # 순서 : 경도 위도
+# # 1. 도로명 주소 → 좌표
+# lon, lat = road_address_to_coordinates("서울특별시 종로구 율곡로 283")
+# print("좌표:", lon, lat)
 
-# 2. 좌표 → 지번주소
-if lon and lat:
-    jibun = coordinates_to_jibun_address(lon, lat)
-    print("지번주소:", jibun)
+# # 2. 좌표 → 지번주소
+# if lon and lat:
+#     jibun = coordinates_to_jibun_address(lon, lat)
+#     print("지번주소:", jibun)

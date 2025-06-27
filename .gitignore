@@ -196,3 +196,4 @@ cython_debug/
 # added
 *.csv
 db/
+*.xlsx
