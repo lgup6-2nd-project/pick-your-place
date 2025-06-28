@@ -2,7 +2,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from vword_geocode import road_address_to_coordinates, coordinates_to_jibun_address
+from geocoding.vworld_geocode import road_address_to_coordinates, coordinates_to_jibun_address
 from admin_mapper import extract_gu_and_dong, get_gu_dong_codes
 
 # Step 1. 도로명 주소 → 좌표
