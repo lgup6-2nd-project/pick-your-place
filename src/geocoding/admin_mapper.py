@@ -21,7 +21,7 @@ def extract_gu_and_dong(address: str) -> tuple:
 
 def get_gu_dong_codes(gu: str, dong: str) -> tuple:
     """
-    자치구명과 동명을 입력받아 자치구코드와 법정동코드를 반환.
+    자치구명과 동명을 입력받아 행정동동코드와 법정동코드를 반환.
     '종로5.6가동' 같이 합쳐진 행정동명에 대해서도 동 이름 분해 후 매칭.
 
     Returns:
