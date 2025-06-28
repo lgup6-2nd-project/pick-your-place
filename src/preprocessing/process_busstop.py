@@ -1,34 +1,76 @@
-# 📄 src/preprocessing/process_busstop.py
-
-import sys
 import os
+import sys
+import pandas as pd
+from tqdm import tqdm
+
+# 경로 설정
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from data_loader.busstop_api import fetch_bus_stop_data
+from geocoding.vworld_geocode import coordinates_to_jibun_address
+from geocoding.admin_mapper import extract_gu_and_dong, get_gu_dong_codes
 
-import pandas as pd
+RAW_PATH = "data/raw/busstop__raw.csv"
+OUTPUT_PATH = "data/processed/busstop__processed.csv"
 
-def load_and_show_bus_stop_data():
-    all_data = []
+def enrich_with_admin_info(df: pd.DataFrame) -> pd.DataFrame:
+    gu_names = []
+    dong_names = []
+    gu_codes = []
+    dong_codes = []
+    jibun_addresses = []
 
-    # 총 11290개 → 1000개씩 반복 호출
-    for start in range(1, 11291, 1000):
-        end = min(start + 999, 11290)
-        rows = fetch_bus_stop_data(start, end)
-        all_data.extend(rows)
+    for _, row in tqdm(df.iterrows(), total=len(df), desc="📍 행정동 정보 추출 중"):
+        try:
+            lon = row["XCRD"]
+            lat = row["YCRD"]
 
-    # pandas DataFrame으로 변환
-    df = pd.DataFrame(all_data)
+            jibun = coordinates_to_jibun_address(lon, lat)
+            jibun_addresses.append(jibun)
 
-    # 필요한 컬럼만 선택
-    df = df[['STOPS_NO', 'STOPS_NM', 'XCRD', 'YCRD', 'NODE_ID', 'STOPS_TYPE']]
-    df.columns = ['stop_no', 'stop_name', 'longitude', 'latitude', 'node_id', 'stop_type']
+            if jibun is None:
+                gu_names.append(None)
+                dong_names.append(None)
+                gu_codes.append(None)
+                dong_codes.append(None)
+                continue
 
-    # head 출력
-    print(df.head())
+            gu, dong = extract_gu_and_dong(jibun)
+            gu_code, dong_code = get_gu_dong_codes(gu, dong)
+
+            gu_names.append(gu)
+            dong_names.append(dong)
+            gu_codes.append(gu_code)
+            dong_codes.append(dong_code)
+
+        except Exception as e:
+            print(f"[❌ 에러] {e}")
+            jibun_addresses.append(None)
+            gu_names.append(None)
+            dong_names.append(None)
+            gu_codes.append(None)
+            dong_codes.append(None)
+
+    df["jibun_address"] = jibun_addresses
+    df["gu_name"] = gu_names
+    df["dong_name"] = dong_names
+    df["gu_code"] = gu_codes
+    df["dong_code"] = dong_codes
 
     return df
 
-# 직접 실행 시
+def load_and_process():
+    if not os.path.exists(RAW_PATH):
+        print(f"[❌ 파일 없음] {RAW_PATH}")
+        return
+
+    df = pd.read_csv(RAW_PATH)
+
+    df = enrich_with_admin_info(df)
+
+    os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
+    df.to_csv(OUTPUT_PATH, index=False, encoding="utf-8-sig")
+    print(f"[✅ 저장 완료] → {OUTPUT_PATH}")
+
+
 if __name__ == "__main__":
-    load_and_show_bus_stop_data()
+    load_and_process()
