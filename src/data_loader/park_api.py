@@ -6,12 +6,12 @@ from tqdm import tqdm
 
 # .env에서 인증키 불러오기
 load_dotenv()
-SEOUL_API_KEY = os.getenv("SEOUL_API_KEY")
+API_KEY = os.getenv("SEOUL_API_KEY")
 
 # API 구성 요소
 API_TYPE = "json"
 SERVICE_NAME = "SearchParkInfoService"
-BASE_URL = f"http://openAPI.seoul.go.kr:8088/{SEOUL_API_KEY}/{API_TYPE}/{SERVICE_NAME}"
+BASE_URL = f"http://openAPI.seoul.go.kr:8088/{API_KEY}/{API_TYPE}/{SERVICE_NAME}"
 
 # 공원 데이터 수집 함수
 def fetch_park_data(start_index: int, end_index: int) -> list:

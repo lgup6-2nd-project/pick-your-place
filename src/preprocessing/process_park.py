@@ -3,41 +3,54 @@ import sys
 import pandas as pd
 from tqdm import tqdm
 
-# ✅ src 경로 등록
+# ✅ src 경로 추가
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-# ✅ 내부 모듈 import
+from src.geocoding.vworld_geocode import coordinates_to_jibun_address
 from src.geocoding.admin_mapper import extract_gu_and_dong, get_gu_dong_codes
 
 # 경로 설정
 INPUT_PATH = "data/raw/park__raw.csv"
 OUTPUT_PATH = "data/processed/park__processed.csv"
 
-# 사용할 컬럼
-usecols = ["P_IDX", "P_PARK", "P_ZONE", "P_ADDR", "P_ADMINTEL"]
+# 사용할 컬럼 정의
+usecols = [
+    "P_IDX", "P_PARK", "P_ZONE", "P_ADDR", "P_ADMINTEL",
+    "LONGITUDE", "LATITUDE"
+]
+
+# 데이터 불러오기
 df = pd.read_csv(INPUT_PATH, usecols=usecols)
-df = df.dropna(subset=["P_ADDR"]).copy()
+df = df.dropna(subset=["LONGITUDE", "LATITUDE"]).copy()
 
 # 결과 컬럼 추가
+df["jibun_address"] = None
 df["gu_name"] = None
 df["dong_name"] = None
 df["gu_code"] = None
 df["dong_code"] = None
 
-# 주소 기반 추출
+# 주소 및 코드 매핑
 for idx, row in tqdm(df.iterrows(), total=len(df)):
-    try:
-        address = row["P_ADDR"]
+    lat = row["LATITUDE"]
+    lon = row["LONGITUDE"]
 
-        # ① 자치구명, 동명 추출
-        gu_name, dong_name = extract_gu_and_dong(address)
+    try:
+        # ① 위경도 → 지번주소
+        jibun_address = coordinates_to_jibun_address(lat, lon)
+        if jibun_address is None:
+            continue
+
+        # ② 지번주소 → 자치구명, 행정동명
+        gu_name, dong_name = extract_gu_and_dong(jibun_address)
         if gu_name is None or dong_name is None:
             continue
 
-        # ② 코드 매핑
+        # ③ 자치구명, 행정동명 → 코드
         gu_code, dong_code = get_gu_dong_codes(gu_name, dong_name)
 
-        # ③ 저장
+        # ④ 결과 저장
+        df.at[idx, "jibun_address"] = jibun_address
         df.at[idx, "gu_name"] = gu_name
         df.at[idx, "dong_name"] = dong_name
         df.at[idx, "gu_code"] = gu_code
