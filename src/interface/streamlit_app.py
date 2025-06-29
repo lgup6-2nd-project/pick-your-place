@@ -9,8 +9,8 @@ from streamlit_folium import st_folium
 
 st.title("서울시 행정동 추천 지도")
 
-geojson_path = "data/reference/HangJeongDong_ver20250401.geojson"
-score_df = pd.read_csv("data/processed/dong_scores.csv")
+geojson_path = "data/reference/Seoul_HangJeongDong.geojson"
+score_df = pd.read_csv("data/processed/dongjak_dong_scores.csv")
 score_df["adm_cd"] = score_df["adm_cd"].astype(str)
 
 map_obj = draw_choropleth(geojson_path, score_df)
