@@ -8,8 +8,6 @@ from admin_mapper import extract_gu_and_dong, get_gu_dong_codes
 
 print("===")
 
-
-
 # Step 1. 도로명 주소 → 좌표
 lon, lat = road_address_to_coordinates("서울 종로구 율곡로 283")
 print("좌표:", lon, lat)

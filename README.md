@@ -38,7 +38,7 @@
 │   │   └── map_drawer.py
 │   │
 │   └── 📁 interface/
-│       └── app.py
+│       └── streamlit_app.py
 │
 ├── .env
 ├── .ignore
