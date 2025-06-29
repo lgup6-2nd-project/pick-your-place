@@ -1,0 +1,64 @@
+import folium
+from folium import Choropleth, GeoJson, GeoJsonTooltip
+import json
+
+def draw_choropleth(geojson_path, data_df, value_column="final_score"):
+    """
+    주어진 GeoJSON 파일과 데이터프레임을 바탕으로 서울시 행정동 단위 Choropleth(단계 구분도)를 시각화합니다.
+
+    Parameters:
+    - geojson_path (str): GeoJSON 파일 경로. 'adm_cd2' 속성을 포함해야 함.
+    - data_df (pd.DataFrame): 시각화 대상 데이터프레임. 'adm_cd' 컬럼과 value_column을 포함해야 함.
+    - value_column (str): Choropleth 색상값으로 사용할 컬럼명 (기본값: 'final_score')
+
+    Returns:
+    - folium.Map 객체: HTML로 출력 가능한 지도 객체
+    """
+
+    # 지도 객체 생성 (서울 중심 좌표 기준)
+    m = folium.Map(
+        location=[37.5642135, 127.0016985], 
+        zoom_start=11, 
+        width="100%", 
+        height="100%",
+        control_scale=True
+    )
+
+    # GeoJSON 파일을 로드하여 지리 정보를 불러옴
+    with open(geojson_path, encoding="utf-8") as f:
+        geojson_data = json.load(f)
+
+    # 단계 구분도(Choropleth)를 지도에 추가
+    Choropleth(
+        geo_data=geojson_data,
+        data=data_df,
+        columns=["adm_cd", value_column],  # 데이터프레임의 행정동 코드와 점수
+        key_on="feature.properties.adm_cd2",  # GeoJSON과 매핑될 속성
+        fill_color="YlOrRd",  # 색상 스케일
+        fill_opacity=0.7,
+        line_opacity=0.3,
+        legend_name="추천 점수"
+    ).add_to(m)
+
+    # GeoJSON 상에 마우스를 올렸을 때 보여줄 툴팁 정의
+    GeoJson(
+        geojson_data,
+        tooltip=GeoJsonTooltip(
+            fields=["adm_nm"],     # 표시할 속성
+            aliases=["행정동"],     # 속성 이름의 별칭
+            localize=True,
+            sticky=False
+        ),
+        style_function=lambda x: {
+            "fillOpacity": 0,     # 투명 처리 (툴팁용 GeoJson)
+            "color": "black",
+            "weight": 0.3
+        },
+        highlight_function=lambda x: {
+            'color': 'blue',
+            'weight': 3,
+            'fillOpacity': 0.3
+        }
+    ).add_to(m)
+
+    return m
