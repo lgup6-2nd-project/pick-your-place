@@ -67,6 +67,7 @@ git push origin feature/mh-api
 ```bash
 git checkout dev
 git merge origin feature/mh-api
+git push origin dev
 ```
 
 5. merge 오류 시 로컬 최신화 (선택)
