@@ -5,45 +5,42 @@
 📦 pick-your-place/
 │
 ├── 📁 data/
+│   ├── processed/          # 전처리 완료된 동 단위 데이터
 │   ├── raw/                # API/CSV 수집한 원본
-│   └── processed/          # 전처리 완료된 동 단위 데이터
+│   └── reference/          
 │
 ├── 📁 src/
-│   ├── 📁 config/
-│   │   └── settings.py          # API key, 경로, 기준값 등
+│   ├── 📁 config/             # 아직 미생성성
+│   │   └── settings.py         # API key, 경로, 기준값 등
 │   │
 │   ├── 📁 data_loader/
-│   │   ├── marts.py            # 마트/백화점 등 상업시설 API 수집
-│   │   ├── cafes.py            # 카페/편의점 등 편의시설
-│   │   ├── hospitals.py        # 병원/약국 등
-│   │   ├── parks.py            # 공원, 도서관 등
-│   │   └── common.py           # 공통 요청 함수 (requests 등)
+│   │   ├── __init__.py
+│   │   └── 
 │   │
 │   ├── 📁 geocoding/
+│   │   ├── __init__.py
+│   │   ├── admin_mapper.py  
 │   │   ├── latlon_to_dong.py   # 위도/경도 → 행정동 코드 매핑 함수
-│   │   └── dong_mapper.py      # 좌표를 동 코드에 매핑하는 통합 유틸
-│   │
-│   ├── 📁 preprocessing/
-│   │   ├── base_preprocessor.py     # 공통 전처리 클래스/함수
-│   │   ├── process_marts.py         # 마트 관련 전처리
-│   │   ├── process_cafes.py         # 카페 관련 전처리
-│   │   ├── process_hospitals.py     # 병원 관련 전처리
-│   │   └── aggregate_by_dong.py     # 모든 데이터를 동 기준으로 병합
-│   │
-│   ├── 📁 scoring/
-│   │   ├── weight_model.py
-│   │   └── ml_model.py
-│   │
-│   ├── 📁 visualization/
-│   │   └── map_drawer.py
+│   │   └── vworld_geocode.py
 │   │
 │   └── 📁 interface/
-│       └── streamlit_app.py
+│   │   └── streamlit_app.py
+│   │
+│   ├── 📁 notebooks/
+│   │   └──
+│   │
+│   ├── 📁 preprocessing/
+│   │   ├── __init__.py
+│   │   └── generate_seoul_geojson.py
+│   │
+│   └── 📁 visualization/
+│       ├── __init__.py
+│       └── map_drawer.py
 │
 ├── .env
 ├── .ignore
-├── requirements.txt
-└── README.md
+├── README.md
+└── requirements.txt
 ```
 
 ---
@@ -66,12 +63,46 @@ git commit -m "[feature] API 연동"
 git push origin feature/mh-api
 ```
 
-4. GitHub에서 PR -> dev로 merge
-
-5. 로컬 최신화(선택)
+4. dev로 merge
 ```bash
 git checkout dev
+git merge origin feature/mh-api
+```
+
+5. merge 오류 시 로컬 최신화 (선택)
+
+**상황 예시**
+1. 당신: `feature/mh-api` 브랜치 생성 → 작업 시작
+2. 다른 팀원: 먼저 `feature/jh-heatmap` → `dev`에 머지 완료
+3. 당신: 아직 예전 `dev` 기준으로 작업함
+4. → 이 상태에서 PR하려 하니 **dev와 코드가 안 맞음 (conflict)**
+
+**해결방법 (dev → 내 브랜치로 최신화)**
+```bash
+# 1. dev로 이동해서 최신 코드 가져오기
+git checkout dev
 git pull origin dev
+
+# 2. 내 작업 브랜치로 이동
+git checkout feature/mh-api
+
+# 3. dev를 내 브랜치에 병합 (중요!)
+git merge dev
+```
+
+🔁 만약 충돌(conflict)이 발생하면?
+```bash
+# 충돌 파일 수동 수정
+# 충돌 부위: <<<<<<< HEAD ~ ======= ~ >>>>>>> dev
+# 수정 완료 후:
+
+git add .
+git commit -m "[fix] dev 병합 충돌 해결"
+```
+
+✅ 최종적으로 다시 push
+```bash
+git push origin feature/mh-api
 ```
 
 6. 브랜치 정리
@@ -81,4 +112,3 @@ git push origin --delete feature/mh-api
 ```
 
 ---
-
