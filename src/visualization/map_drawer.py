@@ -16,7 +16,13 @@ def draw_choropleth(geojson_path, data_df, value_column="final_score"):
     """
 
     # 지도 객체 생성 (서울 중심 좌표 기준)
-    m = folium.Map(location=[37.5642135, 127.0016985], zoom_start=11)
+    m = folium.Map(
+        location=[37.5642135, 127.0016985], 
+        zoom_start=11, 
+        width="100%", 
+        height="100%",
+        control_scale=True
+    )
 
     # GeoJSON 파일을 로드하여 지리 정보를 불러옴
     with open(geojson_path, encoding="utf-8") as f:
@@ -47,6 +53,11 @@ def draw_choropleth(geojson_path, data_df, value_column="final_score"):
             "fillOpacity": 0,     # 투명 처리 (툴팁용 GeoJson)
             "color": "black",
             "weight": 0.3
+        },
+        highlight_function=lambda x: {
+            'color': 'blue',
+            'weight': 3,
+            'fillOpacity': 0.3
         }
     ).add_to(m)
 
