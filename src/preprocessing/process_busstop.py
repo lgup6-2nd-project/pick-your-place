@@ -58,6 +58,7 @@ def enrich_with_admin_info(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
+
 def load_and_process():
     if not os.path.exists(RAW_PATH):
         print(f"[❌ 파일 없음] {RAW_PATH}")
