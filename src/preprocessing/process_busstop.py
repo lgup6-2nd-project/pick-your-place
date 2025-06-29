@@ -4,10 +4,10 @@ import pandas as pd
 from tqdm import tqdm
 
 # 경로 설정
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from geocoding.vworld_geocode import coordinates_to_jibun_address
-from geocoding.admin_mapper import extract_gu_and_dong, get_gu_dong_codes
+from src.geocoding.vworld_geocode import coordinates_to_jibun_address
+from src.geocoding.admin_mapper import extract_gu_and_dong, get_gu_dong_codes
 
 RAW_PATH = "data/raw/busstop__raw.csv"
 OUTPUT_PATH = "data/processed/busstop__processed.csv"
