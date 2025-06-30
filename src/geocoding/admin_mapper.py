@@ -1,3 +1,4 @@
+import re
 import pandas as pd
 
 # 행정동 코드 엑셀 불러오기 (최초 1회)
@@ -61,3 +62,48 @@ def get_gu_dong_codes(gu: str, dong: str) -> tuple:
         print(f"[오류 발생] {e}")
         return None, None
     
+
+def smart_parse_gu_and_dong(address: str):
+    """
+    주소 문자열에서 자치구, 법정동명을 추출
+    - 괄호 안에 동/가 있으면 사용
+    - 없으면 전체 주소에서 추출
+    - 숫자/번지 제거 포함
+    """
+    try:
+        # ① 자치구 추출
+        gu_match = re.search(r"서울특별시\s+(\S+?구)", address)
+        gu = gu_match.group(1) if gu_match else None
+
+        dong = None
+
+        # ② 괄호 안에서 동/가로 끝나는 단어 추출
+        bracket_match = re.search(r"\(([^)]+)\)", address)
+        if bracket_match:
+            candidate = bracket_match.group(1)
+            # 괄호 안에서 동/가로 끝나는 단어만 허용
+            if re.search(r"(동|가)$", candidate):
+                dong = candidate.strip()
+
+        # ③ fallback: 괄호 안 실패 시 전체 주소에서 추출
+        if not dong:
+            # 괄호 제외한 주소에서 동명 찾기
+            address_cleaned = re.sub(r"\(.*?\)", "", address)
+            after_gu = address_cleaned.split(gu)[-1] if gu else address_cleaned
+            tokens = after_gu.strip().split()
+            for token in tokens:
+                token_clean = re.sub(r"[0-9\-]+.*", "", token)  # 번지 제거
+                if token_clean.endswith("동") or token_clean.endswith("가"):
+                    dong = token_clean.strip()
+                    break
+
+        # ④ 결과 반환
+        if gu and dong:
+            return gu, dong
+        else:
+            print(f"[동명 추출 실패] {address}")
+            return None, None
+
+    except Exception as e:
+        print(f"[파싱 예외] {address} → {e}")
+        return None, None
