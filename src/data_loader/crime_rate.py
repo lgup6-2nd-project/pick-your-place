@@ -1,35 +1,43 @@
+import os
 import pandas as pd
 
-def calculate_percentages(file_path: str, output_path: str):
-    df_all = pd.read_excel(file_path, skiprows=0)
-    total_row = df_all.iloc[0]
-    df = pd.read_excel(file_path, skiprows=2) # 자치구 데이터만 (3번째 행부터)
+def calculate_percentages(file_path: str):
+    df_all = pd.read_excel(file_path, header=None)
 
-    # 이름 재정의
-    df.columns = ["자치구", "소계", "발생", "검거", "살인_발생", "살인_검거", "강도_발생", "강도_검거",
-                  "강간_발생", "강간_검거", "절도_발생", "절도_검거", "폭력_발생", "폭력_검거"]
+    # '합계' 행 인덱스 찾기 (index=4인 행)
+    total_row = df_all.iloc[4]
 
-    total_occurrence = total_row[2] # 전체 '발생 소계' (자치구별 발생총합)
+    raw_total = str(total_row.iloc[2]).replace(",", "")
+    total_occurrence = pd.to_numeric(raw_total, errors='coerce')
+    if pd.isna(total_occurrence):
+        raise ValueError(f"총 발생 건수가 유효하지 않음: {total_row.iloc[2]}")
 
-    # 범죄별 발생 소계
-    total_by_crime = {
-        "살인_발생": total_row[4],
-        "강도_발생": total_row[6],
-        "강간_발생": total_row[8],
-        "절도_발생": total_row[10],
-        "폭력_발생": total_row[12]
-    }
+    # 자치구별 데이터는 5번째 행부터
+    df = df_all.iloc[5:].copy()
 
-    # 자치구별 범죄 발생률 계산: 자치구 해당 범죄 / 전체 발생 소계
+    # 컬럼 이름 지정
+    df.columns = ["자치구_대분류", "자치구", "발생", "검거", "살인_발생", "살인_검거", 
+                  "강도_발생", "강도_검거", "강간_발생", "강간_검거", 
+                  "절도_발생", "절도_검거", "폭력_발생", "폭력_검거"]
+
+    # 불필요한 컬럼 제거
+    df.drop(columns=["자치구_대분류", "검거", "살인_검거", "강도_검거", "강간_검거", "절도_검거", "폭력_검거"], inplace=True)
+
+    # 숫자 변환
+    for col in ["발생", "살인_발생", "강도_발생", "강간_발생", "절도_발생", "폭력_발생"]:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    # 발생률 계산
     for crime in ["살인", "강도", "강간", "절도", "폭력"]:
         col_name = f"{crime}_발생"
         rate_col = f"{crime}_발생률(%)"
         df[rate_col] = (df[col_name] / total_occurrence * 100).round(2)
 
-    # 자치구별 전체 발생률 (전체 자치구 발생 / 전체 발생 소계)
     df["자치구_총발생률(%)"] = (df["발생"] / total_occurrence * 100).round(2)
 
-    df.to_excel(output_path, index=False)
-    print(f"저장 완료: {output_path}")
+    output_path_abs = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'crime_rate__processed.csv'))
+    df.to_csv(output_path_abs, index=False, encoding="utf-8-sig")
+    print(f"[저장 완료] → {output_path_abs}")
 
-calculate_percentages("../../data/raw/5대 범죄 발생현황.xlsx", "../../data/processed/crime_rate__processed.xlsx")
+file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'raw', '5대범죄발생현황.xlsx'))
+calculate_percentages(file_path)
