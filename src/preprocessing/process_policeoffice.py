@@ -31,9 +31,9 @@ from src.geocoding.admin_mapper import (
 )
 
 # 파일 경로
-INPUT_PATH = "data/raw/policestation__raw.csv"
-OUTPUT_PATH = "data/processed/policestation__processed.csv"
-FAILED_PATH = "data/processed/policestation__failed.csv"
+INPUT_PATH = "data/raw/policeoffice__raw.csv"
+OUTPUT_PATH = "data/processed/policeoffice__processed.csv"
+FAILED_PATH = "data/processed/policeoffice__failed.csv"
 
 # 도로명 주소 보정 목록
 manual_address_corrections = {
@@ -129,6 +129,9 @@ def preprocess_police_data(input_path: str, output_path: str):
     seoul_df["gu_code"] = gu_codes
     seoul_df["dong_code"] = dong_codes
 
+    # 불필요 컬럼 제거
+    seoul_df.drop(columns=["경찰서주소", "위치"], inplace=True, errors="ignore")
+    
     # 저장
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     seoul_df.to_csv(output_path, index=False, encoding="utf-8-sig")

@@ -61,7 +61,7 @@ def fetch_police_station_data_all() -> list:
 
     return all_data
 
-def save_to_csv(data: list, output_path: str = "data/raw/policestation__raw.csv"):
+def save_to_csv(data: list, output_path: str = "data/raw/policeoffice__raw.csv"):
     if not data:
         print("[❌ 저장 실패] 저장할 데이터가 없습니다.")
         return
