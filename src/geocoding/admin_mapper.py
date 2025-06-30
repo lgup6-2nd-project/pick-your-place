@@ -36,6 +36,15 @@ def get_gu_dong_codes(gu: str, dong: str) -> tuple:
     자치구 + 법정동 기준으로 행정동 이름 → 코드 반환
     """
     try:
+        # (0) 이미 행정동이면 바로 코드 조회
+        direct = dong_df[
+            (dong_df["시군구명"] == gu) & (dong_df["읍면동명"] == dong)
+        ]
+        if not direct.empty:
+            dong_code = direct.iloc[0]["행정동코드"]
+            gu_code = dong_code[:5]
+            return gu_code, dong_code
+        
         # (1) 법정동 → 행정동명 매핑
         match = mix_df[(mix_df["gu_name"] == gu) & (mix_df["legal_dong"] == dong)]
 
