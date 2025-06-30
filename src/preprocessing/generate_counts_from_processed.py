@@ -8,10 +8,12 @@ OUTPUT_DIR = "data/processed_counts/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 처리 대상 파일 목록 (언더바 두 개)
-# file_paths = glob.glob(os.path.join(INPUT_DIR, "*__processed.csv"))
-file_paths = glob.glob(os.path.join(INPUT_DIR, "hospital__processed.csv"))
+file_paths = glob.glob(os.path.join(INPUT_DIR, "*__processed.csv"))
+# bank__processed.csv 제외
+file_paths = [f for f in file_paths if not f.endswith("bank__processed.csv")]
 
 for file_path in file_paths:
+    print(f"[처리 중] {file_path}")
     df = pd.read_csv(file_path)
 
     # gu_code, dong_code를 nullable 정수형으로 변환
@@ -32,3 +34,8 @@ for file_path in file_paths:
     # 저장
     count_df.to_csv(save_path, index=False)
     print(f"[저장 완료] {save_path}")
+<<<<<<< HEAD
+=======
+
+    
+>>>>>>> 8b9c169 (score, count update)
