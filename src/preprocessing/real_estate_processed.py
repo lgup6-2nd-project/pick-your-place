@@ -55,7 +55,7 @@ def real_estate_processed(file_path: str, output_path: str):
     print("\n[자치구별 1m^2당 평균 물건금액 (원)]\n", gu_avg_price)
 
     output_path_abs = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'real_estate__processed.csv'))
-    gu_avg_price_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'real_estate_gu_avg__processed.csv'))
+    gu_avg_price_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'real_estate_dong_avg__processed.csv'))
 
     processed_df.to_csv(output_path_abs, index=False, encoding="utf-8-sig")
     gu_avg_price.to_csv(gu_avg_price_path, encoding="utf-8-sig")
