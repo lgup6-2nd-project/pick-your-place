@@ -1,0 +1,44 @@
+import os
+import glob
+import pandas as pd
+
+# 입력과 출력 디렉토리 설정
+INPUT_DIR = "data/processed/"
+OUTPUT_DIR = "data/processed_counts/"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+# 처리 대상 파일 목록 (언더바 두 개)
+file_paths = glob.glob(os.path.join(INPUT_DIR, "*__processed.csv"))
+# bank__processed.csv 제외
+file_paths = [f for f in file_paths if not f.endswith("bank__processed.csv")]
+
+for file_path in file_paths:
+    print(f"[처리 중] {file_path}")
+    df = pd.read_csv(file_path)
+
+    required_cols = {"gu_code", "dong_code", "gu_name", "dong_name"}
+    if not required_cols.issubset(df.columns):
+        print(f"[스킵] 필수 컬럼 누락: {file_path}")
+        print(f"[컬럼 목록] {df.columns.tolist()}")  # <-- 이 줄도 추가!
+        continue
+
+    # gu_code, dong_code를 nullable 정수형으로 변환
+    df["gu_code"] = pd.to_numeric(df["gu_code"], errors="coerce").astype("Int64")
+    df["dong_code"] = pd.to_numeric(df["dong_code"], errors="coerce").astype("Int64")
+
+    # 행정동 기준 개수 집계
+    count_df = (
+        df.groupby(["gu_code", "dong_code", "gu_name", "dong_name"])
+        .size()
+        .reset_index(name="counts")
+    )
+
+    # 저장 파일명 지정
+    base_name = os.path.basename(file_path).replace("__processed.csv", "__counts.csv")
+    save_path = os.path.join(OUTPUT_DIR, base_name)
+
+    # 저장
+    count_df.to_csv(save_path, index=False)
+    print(f"[저장 완료] {save_path}")
+
+    
