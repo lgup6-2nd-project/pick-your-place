@@ -3,14 +3,33 @@ import sys
 import pandas as pd
 import streamlit as st
 from streamlit_folium import st_folium
+import pymysql
 
-# src 경로 추가
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-from src.visualization.map_drawer import draw_choropleth
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from visualization.map_drawer import draw_choropleth
 
 # 페이지 설정
 st.set_page_config(layout="wide")
 st.title("서울시 행정동 추천 시스템")
+
+def get_connection():
+    return pymysql.connect(
+        host=os.environ["DB_HOST"],
+        user=os.environ["DB_USER"],
+        password=os.environ["DB_PASSWORD"],
+        database=os.environ["DB_NAME"],
+        charset="utf8mb4"
+    )
+
+try:
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SHOW TABLES;")
+    tables = cursor.fetchall()
+    st.success("DB 연결 성공!")
+    st.write("테이블 목록:", tables)
+except Exception as e:
+    st.error(f"DB 연결 실패: {e}")
 
 # ✅ 카테고리별 변수 매핑
 category_mapping = {

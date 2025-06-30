@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: pickyourplace-mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pickyourplace-db
+      MYSQL_USER: pypuser
+      MYSQL_PASSWORD: pyppassword
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password --bind-address=0.0.0.0
+    networks:
+      - backend
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: streamlit-app
+    ports:
+      - "8501:8501"
+    depends_on:
+      - db
+    volumes:
+      - ./src:/app
+      - ./data:/app/data    # data 디렉터리도 /app 내부로 마운트
+    environment:
+      DB_HOST: db
+      DB_USER: pypuser
+      DB_PASSWORD: pyppassword
+      DB_NAME: pickyourplace-db
+    networks:
+      - backend
+
+networks:
+  backend:
