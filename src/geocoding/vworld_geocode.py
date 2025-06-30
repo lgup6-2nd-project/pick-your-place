@@ -66,6 +66,36 @@ def coordinates_to_jibun_address(longitude: float, latitude: float) -> str:
         print(f"[예외 발생 - 좌표→지번주소] {e}")
         return None
 
+
+def coordinates_to_road_address(longitude: float, latitude: float) -> str:
+    """
+    위도/경도 → 도로명주소 반환 (VWorld Geocoder API 사용)
+    """
+    api_url = "https://api.vworld.kr/req/address"
+    params = {
+        "service": "address",
+        "request": "getAddress",
+        "format": "json",
+        "type": "ROAD",  # 도로명주소 반환
+        "point": f"{longitude},{latitude}",
+        "key": VWORLD_API_KEY
+    }
+
+    response = requests.get(api_url, params=params)
+
+    if response.status_code == 200:
+        result = response.json()
+        address_info = result.get("response", {}).get("result", [])
+        if address_info:
+            return address_info[0].get("text")
+        else:
+            print(f"[도로명주소 없음] ({longitude}, {latitude})")
+            return None
+    else:
+        print(f"[API 오류] status: {response.status_code}")
+        return None
+    
+    
 # # 순서 : 경도 위도
 # # 1. 도로명 주소 → 좌표
 # lon, lat = road_address_to_coordinates("서울특별시 종로구 율곡로 283")
