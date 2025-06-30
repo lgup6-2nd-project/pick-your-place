@@ -19,8 +19,8 @@ def draw_choropleth(geojson_path, data_df, value_column="final_score"):
     m = folium.Map(
         location=[37.5642135, 127.0016985],  # 서울 중심 좌표
         zoom_start=11,                      # 초기 확대 수준
-        width="100%",                       # 지도의 가로 크기 - 반응형 설정
-        height="100%",                      # 지도의 세로 크기 - 반응형 설정
+        width=1000,                       # 지도의 가로 크기 - 반응형 설정
+        height=600,                      # 지도의 세로 크기 - 반응형 설정
         control_scale=True                  # 축척 컨트롤 추가
     )
 
