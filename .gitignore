@@ -197,3 +197,4 @@ cython_debug/
 *.csv
 db/
 *.xlsx
+*.geojson
