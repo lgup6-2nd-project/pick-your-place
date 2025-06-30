@@ -26,14 +26,10 @@ def process_data(df):
     processed_list = []
     for _, item in df.iterrows():
         row = {
-            "gu_code": item.get("CGG_CD"),
-            "gu_name": item.get("CGG_NM"),
-            "bu_code": item.get("STDG_CD"),
-            "bu_name": item.get("STDG_NM"),
-            "jibun_address": item.get("LOTNO_SE"),
-            "building_name": item.get("BLDG_NM"),
-            "물건금액(만원)": item.get("THING_AMT"),
-            "건물면적(m^2)": item.get("ARCH_AREA"),
+            "gu_name": item.get("자치구명"),
+            "dong_name": item.get("법정동명"),
+            "건물면적(m^2)": item.get("건물면적(㎡)"),
+            "물건금액(만원)": item.get("물건금액(만원)"),
         }
         row["1m2당물건금액(원)"] = calc_price_per_m2(
             row["물건금액(만원)"],
@@ -42,21 +38,29 @@ def process_data(df):
         processed_list.append(row)
     return pd.DataFrame(processed_list)
 
-
 """파일 읽어오기"""
 def real_estate_processed(file_path: str, output_path: str):
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_path, encoding="utf-8-sig")
     processed_df = process_data(df)
 
-    # 자치구별 1m^2당 평균 물건금액 계산
-    gu_avg_price = processed_df.groupby("gu_name")["1m2당물건금액(원)"].mean().sort_values(ascending=False)
+    print("처리된 데이터 수:", len(processed_df))
+    print(processed_df.head())
+
+    gu_avg_price = (
+        processed_df.groupby("dong_name")["1m2당물건금액(원)"]
+        .mean()
+        .round(1)
+        .sort_values(ascending=False)
+    )
     print("\n[자치구별 1m^2당 평균 물건금액 (원)]\n", gu_avg_price)
 
-    processed_df.to_csv(output_path, index=False, encoding="utf-8-sig")
-    gu_avg_price.to_csv("../../data/processed/real_estate_gu_avg__processed.csv", encoding="utf-8-sig")
+    output_path_abs = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'real_estate__processed.csv'))
+    gu_avg_price_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'real_estate_gu_avg__processed.csv'))
+
+    processed_df.to_csv(output_path_abs, index=False, encoding="utf-8-sig")
+    gu_avg_price.to_csv(gu_avg_price_path, encoding="utf-8-sig")
 
     return gu_avg_price
-
 
 # 절대 경로 설정 및 실행
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'raw', 'real_estate__raw.csv'))
