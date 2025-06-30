@@ -69,7 +69,11 @@
 # result.to_csv(OUTPUT_PATH, index=False)
 # print(f"[저장 완료] → {OUTPUT_PATH}")
 #####################################################################
-
+"""
+Geocoder API 사용횟수를 초과하였습니다. 이슈 발생
+Windows PowerShell >  taskkill /F /IM python.exe
+입력하여 python 강제종료 필요
+"""
 import os
 import sys
 import pandas as pd
