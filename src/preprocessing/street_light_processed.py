@@ -41,7 +41,7 @@ def street_light_processed(file_path: str, output_path: str):
     df['gu_name'] = gu_list
     df['dong_name'] = dong_list
 
-    gu_counts = df['gu_name'].value_counts()
+    gu_counts = df['dong_name'].value_counts()
     print("\n자치구별 가로등 개수:\n", gu_counts)
 
     output_path_abs = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'street_light__processed.csv'))
@@ -58,7 +58,7 @@ def street_light_processed(file_path: str, output_path: str):
     return gu_counts
 
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'raw', 'street_light__raw.csv'))
-# print("절대경로로 확인:", file_path)
+print("절대경로로 확인:", file_path)
 
 street_light_processed(
     file_path,                                          # raw 데이터

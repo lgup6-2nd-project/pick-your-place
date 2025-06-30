@@ -19,6 +19,11 @@ def safety_bell_processed(file_path: str, output_path: str):
 
     for _, row in tqdm(df.iterrows(), total=len(df)):
         address = row.get("소재지지번주소")
+        
+        # 문자열이 아니면 건너뛰기
+        if not isinstance(address, str):
+            continue
+        
         try:
             gu, dong = extract_gu_and_dong(address)
             row["gu_name"] = gu
@@ -30,17 +35,17 @@ def safety_bell_processed(file_path: str, output_path: str):
 
     result_df = pd.DataFrame(processed_list)
      # 자치구별 개수 집계
-    gu_counts = result_df['gu_name'].value_counts().reset_index()
-    gu_counts.columns = ['gu_name', 'count']
+    gu_counts = result_df['dong_name'].value_counts().reset_index()
+    gu_counts.columns = ['dong_name', 'count']
 
-    gu_counts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'bell_gu_counts.csv'))
+    gu_counts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'bell_dong_counts.csv'))
     
     # 코드 돌리고 주석 처리할 것 
     # 경로 디렉토리 없으면 생성
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     os.makedirs(os.path.dirname(gu_counts_path), exist_ok=True)
 
-    gu_counts.to_csv(gu_counts_path, encoding="utf-8-sig")  
+    gu_counts.to_csv(gu_counts_path,index=False, encoding="utf-8-sig")  
     result_df.to_csv(output_path, index=False, encoding="utf-8-sig")
 
     return result_df, gu_counts
