@@ -15,50 +15,51 @@ def draw_choropleth(geojson_path, data_df, value_column="final_score"):
     - folium.Map 객체: HTML로 출력 가능한 지도 객체
     """
 
-    # 지도 객체 생성 (서울 중심 좌표 기준)
+    # folium 지도 객체 생성 (서울 중심 좌표 기준, 줌레벨 11)
     m = folium.Map(
-        location=[37.5642135, 127.0016985], 
-        zoom_start=11, 
-        width="100%", 
-        height="100%",
-        control_scale=True
+        location=[37.5642135, 127.0016985],  # 서울 중심 좌표
+        zoom_start=11,                      # 초기 확대 수준
+        width="100%",                       # 지도의 가로 크기 - 반응형 설정
+        height="100%",                      # 지도의 세로 크기 - 반응형 설정
+        control_scale=True                  # 축척 컨트롤 추가
     )
 
-    # GeoJSON 파일을 로드하여 지리 정보를 불러옴
+    # GeoJSON 파일 로드 (서울시 행정동 경계 정보 포함)
     with open(geojson_path, encoding="utf-8") as f:
         geojson_data = json.load(f)
 
-    # 단계 구분도(Choropleth)를 지도에 추가
+    # 단계 구분도 계층(Choropleth) 추가
     Choropleth(
-        geo_data=geojson_data,
-        data=data_df,
-        columns=["adm_cd", value_column],  # 데이터프레임의 행정동 코드와 점수
-        key_on="feature.properties.adm_cd2",  # GeoJSON과 매핑될 속성
-        fill_color="YlOrRd",  # 색상 스케일
-        fill_opacity=0.7,
-        line_opacity=0.3,
-        legend_name="추천 점수"
+        geo_data=geojson_data,                  # 경계 데이터
+        data=data_df,                           # 점수 데이터프레임
+        columns=["adm_cd", value_column],       # (key, value) 매핑 컬럼
+        key_on="feature.properties.adm_cd2",    # GeoJSON의 행정동 코드 속성 (adm_cd2)
+        fill_color="Blues",                    # 색상 스케일
+        fill_opacity=0.7,                       # 색상 투명도
+        line_opacity=0.3,                       # 경계선 투명도
+        legend_name="추천 점수"                 # 범례 제목
     ).add_to(m)
 
-    # GeoJSON 상에 마우스를 올렸을 때 보여줄 툴팁 정의
+    # 마우스오버 시 툴팁(행정동 이름) 보여주는 GeoJSON 레이어
     GeoJson(
         geojson_data,
         tooltip=GeoJsonTooltip(
-            fields=["adm_nm"],     # 표시할 속성
-            aliases=["행정동"],     # 속성 이름의 별칭
-            localize=True,
-            sticky=False
+            fields=["adm_nm"],          # 표시할 속성 필드 (행정동 이름)
+            aliases=["행정동"],          # 필드명 별칭
+            localize=True,              # 현지화
+            sticky=False                # 툴팁 고정 여부
         ),
         style_function=lambda x: {
-            "fillOpacity": 0,     # 투명 처리 (툴팁용 GeoJson)
-            "color": "black",
-            "weight": 0.3
+            "fillOpacity": 0,           # 색상 없음 (투명)
+            "color": "black",           # 경계선 색
+            "weight": 0.3               # 경계선 두께
         },
         highlight_function=lambda x: {
-            'color': 'blue',
-            'weight': 3,
-            'fillOpacity': 0.3
+            'color': 'blue',            # 마우스오버 시 경계선 색
+            'weight': 3,                # 마우스오버 시 경계선 두께
+            'fillOpacity': 0.3          # 마우스오버 시 배경 투명도
         }
     ).add_to(m)
 
+    # 완성된 지도 객체 반환
     return m
