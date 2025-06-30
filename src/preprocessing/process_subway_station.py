@@ -11,8 +11,8 @@ from src.geocoding.vworld_geocode import coordinates_to_jibun_address
 from src.geocoding.admin_mapper import extract_gu_and_dong, get_gu_dong_codes
 
 # 파일 경로 설정
-INPUT_PATH = "data/raw/subwaystation__raw.csv"
-OUTPUT_PATH = "data/processed/subwaystation__processed.csv"
+INPUT_PATH = "data/raw/subway_station__raw.csv"
+OUTPUT_PATH = "data/processed/subway_station__processed.csv"
 
 # 데이터 로드
 df = pd.read_csv(INPUT_PATH)

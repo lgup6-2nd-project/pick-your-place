@@ -9,8 +9,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 from src.geocoding.vworld_geocode import coordinates_to_jibun_address
 from src.geocoding.admin_mapper import extract_gu_and_dong, get_gu_dong_codes
 
-RAW_PATH = "data/raw/busstop__raw.csv"
-OUTPUT_PATH = "data/processed/busstop__processed.csv"
+RAW_PATH = "data/raw/bus_stop__raw.csv"
+OUTPUT_PATH = "data/processed/bus_stop__processed.csv"
 
 def enrich_with_admin_info(df: pd.DataFrame) -> pd.DataFrame:
     gu_names = []

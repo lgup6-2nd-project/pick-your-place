@@ -31,9 +31,9 @@ from src.geocoding.admin_mapper import (
 )
 
 # 파일 경로
-INPUT_PATH = "data/raw/policeoffice__raw.csv"
-OUTPUT_PATH = "data/processed/policeoffice__processed.csv"
-FAILED_PATH = "data/processed/policeoffice__failed.csv"
+INPUT_PATH = "data/raw/police_office__raw.csv"
+OUTPUT_PATH = "data/processed/police_office__processed.csv"
+FAILED_PATH = "data/processed/police_office__failed.csv"
 
 # 도로명 주소 보정 목록
 manual_address_corrections = {

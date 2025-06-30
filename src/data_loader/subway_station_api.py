@@ -29,7 +29,7 @@ if response.status_code == 200:
 
         # 저장
         os.makedirs("data/raw", exist_ok=True)
-        df.to_csv("data/raw/subwaystation__raw.csv", index=False, encoding="utf-8-sig")
+        df.to_csv("data/raw/subway_station__raw.csv", index=False, encoding="utf-8-sig")
         print(f"[완료] 총 {len(df)}개 지하철역 데이터 저장 완료")
 
     except Exception as e:

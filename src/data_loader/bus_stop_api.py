@@ -73,7 +73,7 @@ def fetch_bus_stop_data_all() -> list:
     return all_data
 
 
-def save_to_csv(data: list, output_path: str = "data/raw/busstop__raw.csv"):
+def save_to_csv(data: list, output_path: str = "data/raw/bus_stop__raw.csv"):
     """
     수집된 데이터를 CSV 파일로 저장
     """
