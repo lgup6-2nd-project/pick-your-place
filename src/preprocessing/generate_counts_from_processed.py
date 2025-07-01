@@ -8,8 +8,11 @@ OUTPUT_DIR = "data/processed_counts/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # file_paths = glob.glob(os.path.join(INPUT_DIR, "*__processed.csv"))
-file_paths = glob.glob(os.path.join(INPUT_DIR, "bus_stop__processed.csv"))
+#file_paths = glob.glob(os.path.join(INPUT_DIR, "bus_stop__processed.csv"))
 
+# ✅ 필요한 파일만 직접 지정
+target_files = ["market__processed.csv", "pharmacy__processed.csv"]
+file_paths = [os.path.join(INPUT_DIR, f) for f in target_files]
 
 for file_path in file_paths:
     print(f"[처리 중] {file_path}")

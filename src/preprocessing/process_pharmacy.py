@@ -86,30 +86,35 @@ def safe_extract_gu_dong(addr):
 
 def safe_get_codes(row):
     try:
-        result = get_gu_dong_codes(row['gu_name_from_jibun'], row['dong_name_from_jibun'])
+        result = get_gu_dong_codes(row['gu_name'], row['dong_name_from_jibun'])
         if result and len(result) == 3:
             return pd.Series(result)
         else:
             return pd.Series([None, None, None])
     except Exception as e:
-        print(f"[❌ 코드 매핑 실패] {row['gu_name_from_jibun']}, {row['dong_name_from_jibun']} → {e}")
+        print(f"[❌ 코드 매핑 실패] {row['gu_name']}, {row['dong_name_from_jibun']} → {e}")
         return pd.Series([None, None, None])
 
 def mapping_process(df):
     df = process_pharmacy_data(df)
     df = convert_coords(df)
     df['jibun_address_final'] = df.apply(safe_jibun_address, axis=1)
-    df[['gu_name_from_jibun', 'dong_name_from_jibun']] = df['jibun_address_final'].apply(safe_extract_gu_dong)
+
+    # 지번주소 → (gu_name, dong_name_from_jibun)
+    df[['gu_name', 'dong_name_from_jibun']] = df['jibun_address_final'].apply(safe_extract_gu_dong)
+
+    # gu_name, dong_name_from_jibun → gu_code, dong_code, 행정동명
     df[['gu_code', 'dong_code', 'dong_name']] = df.apply(safe_get_codes, axis=1)
+
     return df
 
 if __name__ == "__main__":
-    df_raw = load_pharmacy_csv()  # 빠른 테스트용 : sample_n=100
+    df_raw = load_pharmacy_csv()  # 빠른 테스트용: sample_n=100
     df = mapping_process(df_raw)
 
     final_cols = [
         'gu_code', 'dong_code',
-        'gu_name_from_jibun', 'dong_name',
+        'gu_name', 'dong_name',
         'jibun_address_final', 'road_address',
         'lon', 'lat',
         'pharmacy_id', 'pharmacy_name'

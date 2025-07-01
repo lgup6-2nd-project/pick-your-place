@@ -2,11 +2,10 @@ import os
 import pandas as pd
 import numpy as np
 
-# 로그 스케일링
+# ------------------ 기본 함수 정의 ------------------ #
 def log_scale(series):
     return np.log1p(series)
 
-# 사용자 가중치 기반 최종 가중치 계산
 def calculate_weights(user_scores, base_weights):
     weighted_scores = {k: base_weights.get(k, 0) * user_scores.get(k, 0) for k in base_weights}
     total = sum(weighted_scores.values())
@@ -14,66 +13,80 @@ def calculate_weights(user_scores, base_weights):
         return base_weights
     return {k: v / total for k, v in weighted_scores.items()}
 
-# 🔹 로직 1: count 데이터 통합
-def load_counts_data(data_dir, area_info_path):
+# ------------------ 로직 1: count 데이터 통합 ------------------ #
+def load_combined_counts(counts_dir, processed_dir):
     df_merged = None
-    csv_files = [f for f in os.listdir(data_dir) if f.endswith(".csv")]
+    feature_to_category = {}
 
-    for file in csv_files:
-        file_path = os.path.join(data_dir, file)
-        feature_name = file.replace("__counts.csv", "")
-        df = pd.read_csv(file_path, dtype={'dong_code': str})
-        val_col = [col for col in df.columns if col != 'dong_code'][0]
-        df = df.rename(columns={val_col: feature_name})
-        df[feature_name] = df[feature_name].fillna(0)
-
-        if df_merged is None:
-            df_merged = df
-        else:
-            df_merged = pd.merge(df_merged, df, on='dong_code', how='outer')
-
-    df_merged = df_merged.fillna(0)
-
-    # 면적 및 동이름 정보 붙이기
-    area_df = pd.read_csv(area_info_path, dtype={'dong_code': str})
-    area_df['area_km2'] = pd.to_numeric(area_df['area_km2'], errors='coerce')
-
-    df_final = pd.merge(df_merged, area_df[['dong_code', 'gu_code', 'gu_name', 'dong_name', 'area_km2']], on='dong_code', how='left')
-    return df_final
-
-
-# 🔹 로직 2: 점수 계산
-def calculate_scores(df, user_input_scores):
-    # 카테고리 정의
+    # 카테고리 매핑
     category_mapping = {
         "transport": ["bus_stop", "subway_station"],
-        "living": ["store", "convenience", "market", "library", "bank", "park"],
+        "living": ["store", "convenience", "market", "library", "park", "bank"],
         "medical": ["pharmacy", "hospital"],
         "safety": ["police_office", "cctv", "street_light", "safety_bell", "crime_rate"],
         "education": ["school"],
         "housing": ["real_estate"]
     }
 
-    feature_to_category = {f: cat for cat, feats in category_mapping.items() for f in feats}
+    # 모든 개별 시설과 해당 카테고리를 연결
+    for cat, features in category_mapping.items():
+        for f in features:
+            feature_to_category[f] = cat
+
+    # 1) __counts.csv 처리
+    for fname in os.listdir(counts_dir):
+        if not fname.endswith("__counts.csv"):
+            continue
+
+        feature = fname.replace("__counts.csv", "")
+        file_path = os.path.join(counts_dir, fname)
+        df = pd.read_csv(file_path, dtype={'dong_code': str})
+
+        # count 컬럼이 있는 경우
+        if 'count' in df.columns:
+            df = df[['dong_code', 'gu_code', 'gu_name', 'dong_name', 'count']]
+            df = df.rename(columns={'count': feature})
+        else:
+            continue
+
+        if df_merged is None:
+            df_merged = df
+        else:
+            df_merged = pd.merge(df_merged, df, on=['dong_code', 'gu_code', 'gu_name', 'dong_name'], how='outer')
+
+    # 2) crime_rate 추가
+    crime_file = os.path.join(processed_dir, "crime_rate__processed.csv")
+    if os.path.exists(crime_file):
+        df_crime = pd.read_csv(crime_file, dtype={'dong_code': str})
+        df_crime = df_crime[['dong_code', 'crime_rate']]
+        df_merged = pd.merge(df_merged, df_crime, on='dong_code', how='left')
+
+    # 3) real_estate 추가
+    real_file = os.path.join(processed_dir, "real_estate_dong_avg__processed.csv")
+    if os.path.exists(real_file):
+        df_real = pd.read_csv(real_file, dtype={'dong_code': str})
+        df_real = df_real[['dong_code', 'real_estate']]
+        df_merged = pd.merge(df_merged, df_real, on='dong_code', how='left')
+
+    return df_merged, feature_to_category
+
+# ------------------ 로직 2: 점수 계산 ------------------ #
+def calculate_scores(df, feature_to_category, user_input_scores, base_weights):
     reverse_features = {'crime_rate', 'real_estate'}
-    density_features = {'bus_stop', 'subway_station', 'cctv', 'street_light', 'safety_bell', 'police_office'}
+    density_features = {'cctv', 'street_light', 'safety_bell', 'police_office', 'bus_stop', 'subway_station'}
 
-    raw_weights = {
-        "transport": 56.0,
-        "living": 37.9 + 34.7 + 24.7,
-        "medical": 29.7,
-        "safety": 44.2,
-        "education": 16.7,
-        "housing": 33.1
-    }
+    # 가중치 계산
+    weights = calculate_weights(user_input_scores, base_weights)
 
-    weights = calculate_weights(user_input_scores, raw_weights)
-
+    # 카테고리별 초기화
     category_scores = {}
     for feature, category in feature_to_category.items():
-        values = log_scale(df[feature])
+        if feature not in df.columns:
+            continue
+        values = log_scale(df[feature].fillna(0))
         if feature in density_features:
-            values = values / df['area_km2'].replace(0, np.nan)
+            if 'area_km2' in df.columns:
+                values = values / df['area_km2'].replace(0, np.nan)
         category_scores.setdefault(category, []).append(values)
 
     # 카테고리별 합산
@@ -83,66 +96,54 @@ def calculate_scores(df, user_input_scores):
         else:
             df[category] = 0.0
 
-    # 정규화 및 역방향 처리
+    # 정규화 + 역방향 처리
     for category in weights:
         min_val = df[category].min()
         max_val = df[category].max()
         if max_val > min_val:
             norm = (df[category] - min_val) / (max_val - min_val)
-            if any(f in reverse_features for f, cat in feature_to_category.items() if cat == category):
+            if any(f in reverse_features for f, c in feature_to_category.items() if c == category):
                 norm = 1 - norm
             df[category + '_norm'] = norm
         else:
             df[category + '_norm'] = 0.5
 
-    # 점수 계산
+    # 최종 점수 계산
     df['final_score'] = 0
     for category in weights:
         df['final_score'] += df[category + '_norm'] * weights.get(category, 0)
 
     df['final_score'] = (df['final_score'] * 100).round(2)
 
-    return df[['gu_code', 'dong_code', 'gu_name', 'dong_name', 'final_score']]\
-        .sort_values(by='final_score', ascending=False).reset_index(drop=True)
+    return df[['gu_code', 'dong_code', 'gu_name', 'dong_name', 'final_score']].sort_values(by='final_score', ascending=False)
 
+# ------------------ 사용 예시 ------------------ #
+if __name__ == "__main__":
+    counts_dir = "C:/Users/Admin/Desktop/pick-your-place/data/processed_counts"
+    processed_dir = "C:/Users/Admin/Desktop/pick-your-place/data/processed"
 
+    base_weights = {
+        "transport": 56.0,
+        "living": 37.9 + 24.7,
+        "medical": 29.7,
+        "safety": 44.2,
+        "education": 16.7,
+        "housing": 33.1
+    }
 
-# ----------------------------- 사용 예시 -------------------------------
-# 카테고리 정의
-category_mapping = {
-    "transport": ["bus_stop", "subway_station"],
-    "living": ["store", "convenience", "market", "library", "bank", "park"],
-    "medical": ["pharmacy", "hospital"],
-    "safety": ["police_office", "cctv", "street_light", "safety_bell", "crime_rate"],
-    "education": ["school"],
-    "housing": ["real_estate"]
-}
+    user_input_scores = {
+        "transport": 8,
+        "living": 9,
+        "medical": 5,
+        "safety": 7,
+        "education": 4,
+        "housing": 3
+    }
 
-# 기본 가중치 (비율 변환 전)
-raw_weights = {
-    "transport": 56.0,
-    "living": 37.9 + 24.7,
-    "medical": 29.7,
-    "safety": 44.2,
-    "education": 16.7,
-    "housing": 33.1
-}
+    # Step 1: 통합된 df + feature to category
+    df_counts, feature_to_category = load_combined_counts(counts_dir, processed_dir)
 
-# 사용자 입력 예시
-user_input_scores = {
-    "transport": 10,
-    "living": 7,
-    "safety": 5,
-    "education": 3,
-    "medical": 8,
-    "housing": 2
-}
+    # Step 2: 점수 계산
+    result_df = calculate_scores(df_counts, feature_to_category, user_input_scores, base_weights)
 
-data_dir = "C:/Users/Admin/Desktop/pick-your-place/data/processed_counts"  # *__counts.csv 파일들이 있는 폴더
-area_info_path = "C:/Users/Admin/Desktop/pick-your-place/model/area_km2.csv"  # 각 동의 면적 정보 포함 CSV
-
-# 로직 1: count 통합
-#df_counts = load_counts_data(data_dir, area_info_path)
-
-# 로직 2: 점수 계산
-#result_df = calculate_scores(df_counts, user_input_scores)
+    print(result_df.head(10))
