@@ -1,4 +1,4 @@
-# pick-your-place
+# PICK-YOUR-PLACE
 
 **LG U+ WHY NOT SW CAMP 6기**  
 
