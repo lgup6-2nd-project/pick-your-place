@@ -81,7 +81,7 @@ with left_col:
             value_column="final_score",
             key_column="dong_code"
         )
-        map_data = st_folium(m, width=1000, height=700, returned_objects=["last_active_drawing"])
+        map_data = st_folium(m, width=1000, height=650, returned_objects=["last_active_drawing"])
 
         if map_data and map_data.get("last_active_drawing"):
             props = map_data["last_active_drawing"]["properties"]
