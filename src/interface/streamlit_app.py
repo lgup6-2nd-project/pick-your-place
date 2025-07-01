@@ -54,7 +54,10 @@ for cat, vars_in_cat in category_mapping.items():
 button_col = st.columns([6, 1])[1]
 with button_col:
     if st.button("✅ 추천 점수 계산"):
-        st.success("추천 점수 계산 로직은 아직 구현되지 않았습니다.")
+        # st.success("추천 점수 계산 로직은 아직 구현되지 않았습니다.")
+        base_df = load_aggregated_data()
+        result_df = calculate_weighted_scores(base_df, weights)
+        st.dataframe(result_df)
 
 # ---------------- 중단: 지도 + 상위 10개 ---------------- #
 st.markdown("---")
@@ -70,23 +73,29 @@ with left_col:
 
     try:
         geojson_path = "data/reference/Seoul_HangJeongDong.geojson"
-        score_path = "data/result/dongjak_dong_scores.csv"
+        
+        # score_path = "data/result/dongjak_dong_scores.csv"
+        # score_df = pd.read_csv(score_path)
+        # score_df["dong_code"] = score_df["dong_code"].astype(str)
 
-        score_df = pd.read_csv(score_path)
-        score_df["dong_code"] = score_df["dong_code"].astype(str)
+        # 동코드 문자열형으로 변환
+        result_df["dong_code"] = result_df["dong_code"].astype(str)
 
+        # 지도 생성
         m = draw_choropleth(
             geojson_path=geojson_path,
-            data_df=score_df,
+            data_df=result_df,
             value_column="final_score",
             key_column="dong_code"
         )
+
+        # st_folium 렌더링
         map_data = st_folium(m, width=1000, height=650, returned_objects=["last_active_drawing"])
 
         if map_data and map_data.get("last_active_drawing"):
             props = map_data["last_active_drawing"]["properties"]
             clicked_code = props.get("adm_cd2")
-            match = score_df[score_df["dong_code"] == clicked_code]
+            match = result_df[result_df["dong_code"] == clicked_code]
             if not match.empty:
                 final_score = match.iloc[0]["final_score"]
                 clicked_dong_name = match.iloc[0]["dong_name"]
@@ -98,9 +107,9 @@ with left_col:
 with right_col:
     st.markdown("#### 🔝 상위 10개 추천 동")
     try:
-        top10_df = score_df.sort_values("final_score", ascending=False).head(10)
-        top10_display = top10_df[["gu_name", "dong_name", "final_score"]].reset_index(drop=True)
-        st.dataframe(top10_display, use_container_width=True)
+        # top10_df = result_df.sort_values("final_score", ascending=False).head(10)
+        # top10_display = top10_df[["gu_name", "dong_name", "final_score"]].reset_index(drop=True)
+        st.dataframe(result_df, use_container_width=True)
     except:
         st.warning("상위 추천 동 정보를 불러올 수 없습니다.")
 
@@ -112,6 +121,7 @@ if clicked_code:
     st.write(f"**행정동:** {clicked_dong_name}")
     if final_score is not None:
         st.write(f"**점수:** {final_score:.2f}")
+        
     else:
         st.warning("해당 동의 점수를 찾을 수 없습니다.")
 else:
