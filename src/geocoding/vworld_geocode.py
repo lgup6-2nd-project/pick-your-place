@@ -95,7 +95,7 @@ def coordinates_to_road_address(longitude: float, latitude: float) -> str:
         print(f"[API 오류] status: {response.status_code}")
         return None
 
-
+# 도로명 -> 지번
 def road_to_jibun_address(road_address: str) -> str:
     try:
         url = "https://apis.vworld.kr/addr2jibun.do"
