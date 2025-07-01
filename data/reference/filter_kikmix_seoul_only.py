@@ -3,7 +3,7 @@ import os
 
 # 📁 입력/출력 경로 설정
 INPUT_PATH = "data/reference/KIKmix.20250701.xlsx"
-OUTPUT_PATH = "data/reference/KIKmix_seoul.20250701.csv"
+OUTPUT_PATH = "data/reference/KIKmix_seoul.20250701.xlsx"
 
 # 📥 엑셀 파일 읽기
 df = pd.read_excel(INPUT_PATH, dtype=str)
