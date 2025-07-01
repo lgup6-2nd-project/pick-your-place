@@ -31,7 +31,7 @@ def calculate_percentages(file_path: str):
 
     # 컬럼명 지정
     df.columns = [
-        "district_category", "district", "counts", "total_arrests",
+        "district_category", "gu_name", "counts", "total_arrests",
         "murder_cases", "murder_arrests", "robbery_cases", "robbery_arrests",
         "sexual_cases", "sexual_arrests", "theft_cases", "theft_arrests",
         "violence_cases", "violence_arrests"
@@ -66,7 +66,7 @@ def calculate_percentages(file_path: str):
 
     # (외부 파일에서 정의된 함수 사용)
     # geocoding/admin_mapper.py 에 정의된 get_gu_code() 함수를 사용해 자치구명을 코드(5자리)로 변환
-    df["gu_code"] = df["district"].apply(get_gu_code)
+    df["gu_code"] = df["gu_name"].apply(get_gu_code)
 
     # gu_code 컬럼을 맨 앞으로 이동
     cols = df.columns.tolist()
