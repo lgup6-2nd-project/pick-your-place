@@ -2,11 +2,20 @@ import re
 import pandas as pd
 
 # 행정동 코드 엑셀 불러오기 (최초 1회)
-DONG_CODE_PATH = 'data/reference/KIKcd_H.20250701.xlsx'
-MIX_MAPPING_PATH = 'data/reference/KIKmix.20250701.xlsx'
+# DONG_CODE_PATH = 'data/reference/KIKcd_H.20250701.xlsx'
+MIX_MAPPING_PATH = 'data/reference/KIKmix_seoul.20250701.xlsx'
 
-dong_df = pd.read_excel(DONG_CODE_PATH, dtype=str)
+# dong_df = pd.read_excel(DONG_CODE_PATH, dtype=str)
 mix_df = pd.read_excel(MIX_MAPPING_PATH, dtype=str)
+
+# 매핑 테이블 정리
+mix_df = mix_df.rename(columns={
+    "시군구명": "gu_name",
+    "동리명": "legal_dong",
+    "읍면동명": "admin_dong",
+    "행정동코드": "admin_code"
+}).dropna(subset=["gu_name", "legal_dong", "admin_dong", "admin_code"])
+
 
 def extract_gu_and_dong(address: str) -> tuple:
     """
@@ -20,15 +29,6 @@ def extract_gu_and_dong(address: str) -> tuple:
     except Exception as e:
         print(f"[주소 파싱 실패] {address} → {e}")
         return None, None
-
-
-# 매핑 테이블 정리
-mix_df = mix_df.rename(columns={
-    "시군구명": "gu_name",
-    "동리명": "legal_dong",
-    "읍면동명": "admin_dong",
-    "행정동코드": "admin_code"
-}).dropna(subset=["gu_name", "legal_dong", "admin_dong", "admin_code"])
 
 # def get_gu_dong_codes(gu: str, dong: str) -> tuple:
 #     """
@@ -187,14 +187,6 @@ def smart2_parse_gu_and_dong(address: str) -> tuple:
         print(f"[파싱 예외] {address} → {e}")
         return None, None
 
-# # 자치구 코드 매핑 파일 경로
-# mix_df = pd.read_excel(MIX_MAPPING_PATH, dtype=str)
-
-# # 컬럼명 정리
-# mix_df = mix_df.rename(columns={
-#     "시군구명": "gu_name",
-#     "행정동코드": "admin_code"
-# }).dropna(subset=["gu_name", "admin_code"])
 
 def get_gu_code(gu_name: str) -> str:
     """
@@ -213,7 +205,6 @@ def get_gu_code(gu_name: str) -> str:
     except Exception as e:
         print(f"[오류 발생] {gu_name} → {e}")
         return None
-
 
 from difflib import get_close_matches
 
@@ -256,3 +247,4 @@ def get_gu_and_gu_codes(dong_name: str) -> tuple:
     except Exception as e:
         print(f"[오류 발생] {dong_name} → {e}")
         return None, None, None
+    

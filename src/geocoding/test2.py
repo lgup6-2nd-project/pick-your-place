@@ -9,8 +9,8 @@ import os
 import sys
 
 # 📁 경로 설정
-INPUT_PATH = "data/processed/bus_stop__processed.csv"
-OUTPUT_PATH = "data/processed/bus_stop__processed_2.csv"
+INPUT_PATH = "data/processed_counts/bell__counts.csv"
+OUTPUT_PATH = "data/processed_counts/bell__counts_2.csv"
 
 # 📌 sys.path에 src 경로 추가
 sys.path.append(os.path.abspath("src"))
@@ -27,11 +27,11 @@ df["gu_name"] = df["gu_name"].str.strip()
 def map_codes(row):
     gu = row["gu_name"]
     dong = row["dong_name"]
-    gu_code, dong_code = get_gu_dong_codes(gu, dong)
-    return pd.Series([gu_code, dong_code])
+    gu_code, dong_code, admin_dong = get_gu_dong_codes(gu, dong)
+    return pd.Series([gu_code, dong_code, admin_dong])
 
-# 🧩 매핑 적용
-df[["gu_code", "dong_code"]] = df.apply(map_codes, axis=1)
+# 🧩 매핑 적용 (dong_name 값도 행정동명으로 갱신)
+df[["gu_code", "dong_code", "dong_name"]] = df.apply(map_codes, axis=1)
 
 # 🧹 서울 외 지역 제거
 before = len(df)

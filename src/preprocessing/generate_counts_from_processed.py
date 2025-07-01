@@ -8,9 +8,11 @@ OUTPUT_DIR = "data/processed_counts/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # file_paths = glob.glob(os.path.join(INPUT_DIR, "*__processed.csv"))
-file_paths = glob.glob(os.path.join(INPUT_DIR, "hospital__processed.csv"))
+file_paths = glob.glob(os.path.join(INPUT_DIR, "bus_stop__processed.csv"))
+
 
 for file_path in file_paths:
+    print(f"[처리 중] {file_path}")
     df = pd.read_csv(file_path)
 
     # gu_code, dong_code를 nullable 정수형으로 변환
