@@ -2,8 +2,8 @@ import re
 import pandas as pd
 
 # 행정동 코드 엑셀 불러오기 (최초 1회)
-DONG_CODE_PATH = 'data/reference/KIKcd_H.20250701.xlsx'
-MIX_MAPPING_PATH = 'data/reference/KIKmix.20250701.xlsx'
+# DONG_CODE_PATH = 'data/reference/KIKcd_H.20250701.xlsx'
+MIX_MAPPING_PATH = 'data/reference/KIKmix_seoul.20250701.xlsx'
 
 # dong_df = pd.read_excel(DONG_CODE_PATH, dtype=str)
 mix_df = pd.read_excel(MIX_MAPPING_PATH, dtype=str)
