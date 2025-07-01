@@ -22,3 +22,7 @@ python-dotenv==1.0.1
 
 openpyxl==3.1.0
 streamlit-folium==0.15.0
+
+pymysql
+jupyterlab
+seaborn
