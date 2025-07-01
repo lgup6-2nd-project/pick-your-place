@@ -198,4 +198,7 @@ cython_debug/
 db/
 *.xlsx
 *.geojson
-data/mysql
+
+data/mysql/
+admdongkor-master/
+
