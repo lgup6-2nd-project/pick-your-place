@@ -63,15 +63,12 @@ def clean_road_address(addr):
 
 def safe_jibun_address(row):
     lon, lat = row['lon'], row['lat']
-    # 1. 좌표 → 지번주소 시도
     if lon and lat:
         addr = coordinates_to_jibun_address(lon, lat)
         if addr and "검색결과가 없습니다" not in addr:
             return addr
-    # 2. 기존 지번주소 있으면 사용
     if isinstance(row.get('jibun_address'), str) and row['jibun_address'].strip():
         return row['jibun_address'].strip()
-    # 3. 도로명주소 → 지번주소 보완
     if isinstance(row.get('road_address'), str):
         cleaned = clean_road_address(row['road_address'])
         addr = road_to_jibun_address(cleaned)
@@ -82,7 +79,6 @@ def safe_jibun_address(row):
 
 def safe_extract_gu_dong(addr):
     try:
-        # 지번주소 → (구명, 법정동명) 추출
         return pd.Series(extract_gu_and_dong(addr)) if addr else pd.Series([None, None])
     except Exception as e:
         print(f"[❌ 법정동 추출 실패] {addr} → {e}")
@@ -90,13 +86,11 @@ def safe_extract_gu_dong(addr):
 
 def safe_get_codes(row):
     try:
-        # 법정동명 기준 → (gu_code, dong_code, 행정동명) 반환
-        codes = get_gu_dong_codes(row['gu_name_from_jibun'], row['dong_name_from_jibun'])
-        # get_gu_dong_codes가 (gu_code, dong_code, dong_name 행정동명) 3개를 반환한다면
-        if len(codes) == 3:
-            return pd.Series(codes)
-        # 만약 2개만 반환하면 행정동명 컬럼 따로 처리 필요
-        return pd.Series([codes[0], codes[1], None])
+        result = get_gu_dong_codes(row['gu_name_from_jibun'], row['dong_name_from_jibun'])
+        if result and len(result) == 3:
+            return pd.Series(result)
+        else:
+            return pd.Series([None, None, None])
     except Exception as e:
         print(f"[❌ 코드 매핑 실패] {row['gu_name_from_jibun']}, {row['dong_name_from_jibun']} → {e}")
         return pd.Series([None, None, None])
@@ -110,12 +104,12 @@ def mapping_process(df):
     return df
 
 if __name__ == "__main__":
-    df_raw = load_pharmacy_csv(sample_n=100)
+    df_raw = load_pharmacy_csv()  # 빠른 테스트용 : sample_n=100
     df = mapping_process(df_raw)
 
     final_cols = [
         'gu_code', 'dong_code',
-        'gu_name_from_jibun', 'dong_name_from_jibun', 'dong_name',
+        'gu_name_from_jibun', 'dong_name',
         'jibun_address_final', 'road_address',
         'lon', 'lat',
         'pharmacy_id', 'pharmacy_name'

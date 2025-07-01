@@ -30,8 +30,4 @@ for file_path in file_paths:
 
     # 저장
     count_df.to_csv(save_path, index=False)
-<<<<<<< HEAD
     print(f"[저장 완료] {save_path}")
-=======
-    print(f"[저장 완료] {save_path}")
->>>>>>> dev
