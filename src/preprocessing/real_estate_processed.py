@@ -43,6 +43,10 @@ def real_estate_processed(file_path: str, output_path: str):
     df = pd.read_csv(file_path, encoding="utf-8-sig")
     processed_df = process_data(df)
 
+    processed_df["평당금액(원)"] = (
+        processed_df["1m2당물건금액(원)"] * 3.305785
+    ).round(0).astype("Int64")  # NaN 안전
+
     print("처리된 데이터 수:", len(processed_df))
     print(processed_df.head())
 
@@ -52,6 +56,7 @@ def real_estate_processed(file_path: str, output_path: str):
         .round(1)
         .sort_values(ascending=False)
     )
+    
     print("\n[자치구별 1m^2당 평균 물건금액 (원)]\n", gu_avg_price)
 
     output_path_abs = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'real_estate__processed.csv'))
@@ -61,6 +66,7 @@ def real_estate_processed(file_path: str, output_path: str):
     gu_avg_price.to_csv(gu_avg_price_path, encoding="utf-8-sig")
 
     return gu_avg_price
+
 
 # 절대 경로 설정 및 실행
 file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'raw', 'real_estate__raw.csv'))

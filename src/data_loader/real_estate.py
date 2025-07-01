@@ -12,7 +12,6 @@ def load_real_estate_csv(filename):
 
     # 필요한 컬럼만 추출
     selected_columns = df[['자치구명', '법정동명', '건물면적(㎡)', '물건금액(만원)']].dropna().reset_index(drop=True)
-
     return selected_columns
 
 
