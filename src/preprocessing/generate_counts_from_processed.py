@@ -8,7 +8,8 @@ OUTPUT_DIR = "data/processed_counts/"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 처리 대상 파일 목록 (언더바 두 개)
-file_paths = glob.glob(os.path.join(INPUT_DIR, "*__processed.csv"))
+# file_paths = glob.glob(os.path.join(INPUT_DIR, "*__processed.csv"))
+file_paths = glob.glob(os.path.join(INPUT_DIR, "hospital__processed.csv"))
 
 for file_path in file_paths:
     df = pd.read_csv(file_path)

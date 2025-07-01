@@ -10,13 +10,12 @@ mix_df = pd.read_excel(MIX_MAPPING_PATH, dtype=str)
 
 def extract_gu_and_dong(address: str) -> tuple:
     """
-    지번주소 문자열에서 자치구와 동명을 추출
-    예: '서울특별시 종로구 종로6가 70-6' → ('종로구', '종로6가')
+    지번주소 문자열에서 자치구와 법정동 추출 (동/가/로 포함)
     """
     try:
         parts = address.strip().split()
-        gu = next((p for p in parts if p.endswith('구')), None)
-        dong = next((p for p in parts if p.endswith('동') or p.endswith('가')), None)
+        gu = next((p for p in parts if p.endswith("구")), None)
+        dong = next((p for p in parts if p.endswith(("동", "가", "로"))), None)
         return gu, dong
     except Exception as e:
         print(f"[주소 파싱 실패] {address} → {e}")
@@ -117,17 +116,51 @@ def smart_parse_gu_and_dong(address: str):
         print(f"[파싱 예외] {address} → {e}")
         return None, None
 
+def smart2_parse_gu_and_dong(address: str) -> tuple:
+    """
+    괄호 안에 동/가 있을 경우 우선 추출, 아니면 전체 주소에서 추출
+    """
+    try:
+        gu_match = re.search(r"서울특별시\s+(\S+?구)", address)
+        gu = gu_match.group(1) if gu_match else None
+        dong = None
 
-# 자치구 코드 매핑 파일 경로
-MIX_MAPPING_PATH = 'data/reference/KIKmix.20250701.xlsx'
-mix_df = pd.read_excel(MIX_MAPPING_PATH, dtype=str)
+        bracket_match = re.search(r"\(([^)]+)\)", address)
+        if bracket_match:
+            candidates = [c.strip() for c in bracket_match.group(1).split(",")]
+            for cand in candidates:
+                if cand.endswith(("동", "가")):  # "로"는 법정동으로만 사용
+                    dong = cand
+                    break
 
-# 컬럼명 정리
-mix_df = mix_df.rename(columns={
-    "시군구명": "gu_name",
-    "행정동코드": "admin_code"
-}).dropna(subset=["gu_name", "admin_code"])
+        # fallback: 괄호 안 실패 → 전체 주소에서 추출
+        if not dong:
+            address_cleaned = re.sub(r"\(.*?\)", "", address)
+            after_gu = address_cleaned.split(gu)[-1] if gu else address_cleaned
+            tokens = after_gu.strip().split()
+            for token in tokens:
+                token_clean = re.sub(r"[0-9\-]+.*", "", token)
+                if token_clean.endswith(("동", "가")):
+                    dong = token_clean.strip()
+                    break
 
+        if gu and dong:
+            return gu, dong
+        else:
+            print(f"[동명 추출 실패] {address}")
+            return None, None
+    except Exception as e:
+        print(f"[파싱 예외] {address} → {e}")
+        return None, None
+
+# # 자치구 코드 매핑 파일 경로
+# mix_df = pd.read_excel(MIX_MAPPING_PATH, dtype=str)
+
+# # 컬럼명 정리
+# mix_df = mix_df.rename(columns={
+#     "시군구명": "gu_name",
+#     "행정동코드": "admin_code"
+# }).dropna(subset=["gu_name", "admin_code"])
 
 def get_gu_code(gu_name: str) -> str:
     """
@@ -146,3 +179,4 @@ def get_gu_code(gu_name: str) -> str:
     except Exception as e:
         print(f"[오류 발생] {gu_name} → {e}")
         return None
+
