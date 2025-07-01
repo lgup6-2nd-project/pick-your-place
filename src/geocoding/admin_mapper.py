@@ -119,6 +119,7 @@ def smart_parse_gu_and_dong(address: str):
 def smart2_parse_gu_and_dong(address: str) -> tuple:
     """
     괄호 안에 동/가 있을 경우 우선 추출, 아니면 전체 주소에서 추출
+    괄호 안에 로 는 법정동으로 인식 후 처리
     """
     try:
         gu_match = re.search(r"서울특별시\s+(\S+?구)", address)
