@@ -94,7 +94,35 @@ def coordinates_to_road_address(longitude: float, latitude: float) -> str:
     else:
         print(f"[API 오류] status: {response.status_code}")
         return None
-    
+
+# 도로명 -> 지번
+def road_to_jibun_address(road_address: str) -> str:
+    try:
+        url = "https://apis.vworld.kr/addr2jibun.do"
+        params = {
+            "addr": road_address,
+            "output": "json",
+            "apiKey": VWORLD_API_KEY
+        }
+        response = requests.get(url, params=params, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            result = data.get("result", {})
+            jibun_addr = result.get("jibunAddr")
+            if jibun_addr and jibun_addr.strip() and jibun_addr != "검색결과가 없습니다":
+                return jibun_addr.strip()
+            else:
+                print(f"[변환 실패] '{road_address}' → 결과 없음 또는 무효: {jibun_addr}")
+        else:
+            print(f"[HTTP 오류] {road_address} → {response.status_code}, 응답: {response.text}")
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"[네트워크 오류] {road_address} → {e}")
+        return None
+    except Exception as e:
+        print(f"[기타 오류] {road_address} → {e}")
+        return None
+
     
 # # 순서 : 경도 위도
 # # 1. 도로명 주소 → 좌표
