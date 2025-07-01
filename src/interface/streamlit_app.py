@@ -70,7 +70,7 @@ with left_col:
 
     try:
         geojson_path = "data/reference/Seoul_HangJeongDong.geojson"
-        score_path = "data/processed/dongjak_dong_scores.csv"
+        score_path = "data/result/dongjak_dong_scores.csv"
 
         score_df = pd.read_csv(score_path)
         score_df["dong_code"] = score_df["dong_code"].astype(str)
