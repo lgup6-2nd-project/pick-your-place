@@ -81,7 +81,11 @@ def load_and_score_counts(count_dir, processed_dir, area_path, user_input_scores
         if file.endswith("__counts.csv"):
             feature = file.replace("__counts.csv", "")
             df = pd.read_csv(os.path.join(count_dir, file), dtype={'dong_code': str})
-            df = df.rename(columns={col: feature for col in df.columns if col != 'dong_code'})
+            
+            # 컬럼이 'dong_code', 'count'라고 가정할 때
+            count_col = [col for col in df.columns if col != 'dong_code'][0]
+            df = df.rename(columns={count_col: feature})
+            
             df[feature] = df[feature].fillna(0)
             df_merged = df if df_merged is None else pd.merge(df_merged, df, on='dong_code', how='outer')
 
@@ -103,7 +107,9 @@ def load_and_score_counts(count_dir, processed_dir, area_path, user_input_scores
     # (3) 면적 병합
     area_df = pd.read_csv(area_path, dtype={'dong_code': str})
     area_df['area'] = pd.to_numeric(area_df['area_km2'], errors='coerce')
-    df_merged = pd.merge(df_merged, area_df[['dong_code', 'gu_code', 'dong_code', 'gu_name', 'dong_name', 'area']], on='dong_code', how='left')
+    area_df = area_df[['dong_code', 'gu_code', 'gu_name', 'dong_name', 'area']]
+    df_merged = pd.merge(df_merged, area_df, on='dong_code', how='left')
+
 
     # (4) 가중치 계산 + 점수 계산
     weights = calculate_weights(user_input_scores)
@@ -111,3 +117,5 @@ def load_and_score_counts(count_dir, processed_dir, area_path, user_input_scores
 
     # (5) 출력 형식 정리
     return df_scored[['gu_code', 'dong_code', 'gu_name', 'dong_name', 'final_score']].sort_values(by='final_score', ascending=False)
+
+__all__ = ['load_and_score_counts', 'category_mapping', 'raw_weights']
