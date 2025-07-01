@@ -38,7 +38,7 @@ def safety_bell_processed(file_path: str, output_path: str):
     gu_counts = result_df['dong_name'].value_counts().reset_index()
     gu_counts.columns = ['dong_name', 'count']
 
-    gu_counts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'bell_dong_counts.csv'))
+    gu_counts_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'processed', 'bell_dong__counts.csv'))
     
     # 코드 돌리고 주석 처리할 것 
     # 경로 디렉토리 없으면 생성
