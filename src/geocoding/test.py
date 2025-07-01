@@ -28,5 +28,5 @@ gu, dong = extract_gu_and_dong(jibun)
 print("자치구:", gu, "행정동:", dong)
 
 # Step 4. 코드 매핑
-gu_code, dong_code = get_gu_dong_codes(gu, dong)
-print("자치구코드:", gu_code, "행정동코드:", dong_code)
+gu_code, dong_code, admin_dong = get_gu_dong_codes(gu, dong)
+print("자치구코드:", gu_code, "행정동코드:", dong_code, "행정동명:", admin_dong)

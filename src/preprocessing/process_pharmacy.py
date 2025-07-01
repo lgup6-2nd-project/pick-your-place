@@ -86,14 +86,11 @@ def safe_extract_gu_dong(addr):
 
 def safe_get_codes(row):
     try:
-        # 법정동명 기준 → (gu_code, dong_code, 행정동명) 반환
-        codes = get_gu_dong_codes(row['gu_name_from_jibun'], row['dong_name_from_jibun'])
-        # get_gu_dong_codes가 (gu_code, dong_code, dong_name 행정동명) 3개를 반환한다면
-        if len(codes) == 3:
-            return pd.Series(codes)
-        # 만약 2개만 반환하면 행정동명 컬럼 따로 처리 필요
-        return pd.Series([codes[0], codes[1], None])
-
+        result = get_gu_dong_codes(row['gu_name_from_jibun'], row['dong_name_from_jibun'])
+        if result and len(result) == 3:
+            return pd.Series(result)
+        else:
+            return pd.Series([None, None, None])
     except Exception as e:
         print(f"[❌ 코드 매핑 실패] {row['gu_name_from_jibun']}, {row['dong_name_from_jibun']} → {e}")
         return pd.Series([None, None, None])
