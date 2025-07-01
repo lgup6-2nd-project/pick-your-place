@@ -5,8 +5,17 @@ import pandas as pd
 DONG_CODE_PATH = 'data/reference/KIKcd_H.20250701.xlsx'
 MIX_MAPPING_PATH = 'data/reference/KIKmix.20250701.xlsx'
 
-dong_df = pd.read_excel(DONG_CODE_PATH, dtype=str)
+# dong_df = pd.read_excel(DONG_CODE_PATH, dtype=str)
 mix_df = pd.read_excel(MIX_MAPPING_PATH, dtype=str)
+
+# 매핑 테이블 정리
+mix_df = mix_df.rename(columns={
+    "시군구명": "gu_name",
+    "동리명": "legal_dong",
+    "읍면동명": "admin_dong",
+    "행정동코드": "admin_code"
+}).dropna(subset=["gu_name", "legal_dong", "admin_dong", "admin_code"])
+
 
 def extract_gu_and_dong(address: str) -> tuple:
     """
@@ -20,15 +29,6 @@ def extract_gu_and_dong(address: str) -> tuple:
     except Exception as e:
         print(f"[주소 파싱 실패] {address} → {e}")
         return None, None
-
-
-# 매핑 테이블 정리
-mix_df = mix_df.rename(columns={
-    "시군구명": "gu_name",
-    "동리명": "legal_dong",
-    "읍면동명": "admin_dong",
-    "행정동코드": "admin_code"
-}).dropna(subset=["gu_name", "legal_dong", "admin_dong", "admin_code"])
 
 # def get_gu_dong_codes(gu: str, dong: str) -> tuple:
 #     """
