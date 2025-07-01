@@ -181,3 +181,45 @@ def get_gu_code(gu_name: str) -> str:
         print(f"[오류 발생] {gu_name} → {e}")
         return None
 
+
+from difflib import get_close_matches
+
+def get_gu_and_gu_codes(dong_name: str) -> tuple:
+    """
+    dong_name(법정동 또는 행정동) 기준으로 가장 유사한 서울시 행정동을 찾아
+    (gu_code, dong_code, gu_name)을 반환합니다.
+
+    Parameters:
+        dong_name (str): 예: '성수동1가', '충무로2가'
+
+    Returns:
+        (gu_code, dong_code, gu_name) or (None, None, None)
+    """
+    try:
+        # 서울특별시 필터링 (이미 필터링된 mix_df를 사용하고 있으므로 생략 가능)
+        candidates = mix_df.copy()
+
+        # 후보셋
+        admin_dongs = candidates["admin_dong"].dropna().unique()
+        legal_dongs = candidates["legal_dong"].dropna().unique()
+
+        # 1️⃣ 행정동 기준 유사 매칭
+        match = get_close_matches(dong_name, admin_dongs, n=1, cutoff=0.6)
+        if match:
+            row = candidates[candidates["admin_dong"] == match[0]].iloc[0]
+            return row["admin_code"][:5], row["admin_code"], row["gu_name"]
+
+        # 2️⃣ 법정동 기준 유사 매칭 → 해당 행정동으로 다시 매핑
+        match = get_close_matches(dong_name, legal_dongs, n=1, cutoff=0.6)
+        if match:
+            filtered = candidates[candidates["legal_dong"] == match[0]]
+            if not filtered.empty:
+                row = filtered.iloc[0]
+                return row["admin_code"][:5], row["admin_code"], row["gu_name"]
+
+        print(f"[동명 매핑 실패] dong_name={dong_name}")
+        return None, None, None
+
+    except Exception as e:
+        print(f"[오류 발생] {dong_name} → {e}")
+        return None, None, None

@@ -5,7 +5,7 @@ from glob import glob
 
 # 파일 경로 설정
 INPUT_DIR = "data/raw/cctv"
-OUTPUT_PATH = "data/processed_counts/cctv__gu_counts.csv"
+OUTPUT_PATH = "data/processed_counts/cctv_gu__counts.csv"
 
 # 1. CCTV CSV 통합
 csv_files = glob(os.path.join(INPUT_DIR, "*.csv"))

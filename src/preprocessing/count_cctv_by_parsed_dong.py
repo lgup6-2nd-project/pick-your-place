@@ -12,7 +12,7 @@ from src.geocoding.admin_mapper import get_gu_dong_codes
 
 # 경로 설정
 INPUT_DIR = "data/raw/cctv"
-OUTPUT_PATH = "data/processed_counts/cctv__parsed_counts.csv"
+OUTPUT_PATH = "data/processed_counts/cctv_parsed__counts.csv"
 MIX_PATH = "data/reference/KIKmix.20250701.xlsx"
 
 # 1. CCTV CSV 통합
