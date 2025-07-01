@@ -117,20 +117,29 @@ def smart_parse_gu_and_dong(address: str):
         print(f"[파싱 예외] {address} → {e}")
         return None, None
 
+
 # 자치구 코드 매핑 파일 경로
-GU_CODE_PATH = "data/reference/gu_code.csv"
-# 자치구 코드 매핑 로드
-gu_code_df = pd.read_csv(GU_CODE_PATH, dtype=str, encoding='cp949')
+MIX_MAPPING_PATH = 'data/reference/KIKmix.20250701.xlsx'
+mix_df = pd.read_excel(MIX_MAPPING_PATH, dtype=str)
+
+# 컬럼명 정리
+mix_df = mix_df.rename(columns={
+    "시군구명": "gu_name",
+    "행정동코드": "admin_code"
+}).dropna(subset=["gu_name", "admin_code"])
+
 
 def get_gu_code(gu_name: str) -> str:
     """
-    자치구 이름을 자치구 코드로 변환
+    자치구 이름을 자치구 코드(5자리)로 변환
     예: '강남구' → '111261'
     """
     try:
-        match = gu_code_df[gu_code_df["측정소명"] == gu_name]
+        match = mix_df[mix_df["gu_name"] == gu_name]
         if not match.empty:
-            return match.iloc[0]["측정소코드"]
+            admin_code = match.iloc[0]["admin_code"]
+            gu_code = admin_code[:5]
+            return gu_code
         else:
             print(f"[자치구 코드 매핑 실패] gu_name={gu_name}")
             return None
