@@ -116,4 +116,24 @@ def smart_parse_gu_and_dong(address: str):
     except Exception as e:
         print(f"[파싱 예외] {address} → {e}")
         return None, None
-    
+
+# 자치구 코드 매핑 파일 경로
+GU_CODE_PATH = "data/reference/gu_code.csv"
+# 자치구 코드 매핑 로드
+gu_code_df = pd.read_csv(GU_CODE_PATH, dtype=str, encoding='cp949')
+
+def get_gu_code(gu_name: str) -> str:
+    """
+    자치구 이름을 자치구 코드로 변환
+    예: '강남구' → '111261'
+    """
+    try:
+        match = gu_code_df[gu_code_df["측정소명"] == gu_name]
+        if not match.empty:
+            return match.iloc[0]["측정소코드"]
+        else:
+            print(f"[자치구 코드 매핑 실패] gu_name={gu_name}")
+            return None
+    except Exception as e:
+        print(f"[오류 발생] {gu_name} → {e}")
+        return None
