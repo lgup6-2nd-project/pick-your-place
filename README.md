@@ -1,4 +1,3 @@
-# pick-your-place
 
 # PICK-YOUR-PLACE
 
