@@ -187,14 +187,6 @@ def smart2_parse_gu_and_dong(address: str) -> tuple:
         print(f"[파싱 예외] {address} → {e}")
         return None, None
 
-# # 자치구 코드 매핑 파일 경로
-# mix_df = pd.read_excel(MIX_MAPPING_PATH, dtype=str)
-
-# # 컬럼명 정리
-# mix_df = mix_df.rename(columns={
-#     "시군구명": "gu_name",
-#     "행정동코드": "admin_code"
-# }).dropna(subset=["gu_name", "admin_code"])
 
 def get_gu_code(gu_name: str) -> str:
     """
@@ -213,7 +205,6 @@ def get_gu_code(gu_name: str) -> str:
     except Exception as e:
         print(f"[오류 발생] {gu_name} → {e}")
         return None
-
 
 from difflib import get_close_matches
 
@@ -256,3 +247,4 @@ def get_gu_and_gu_codes(dong_name: str) -> tuple:
     except Exception as e:
         print(f"[오류 발생] {dong_name} → {e}")
         return None, None, None
+    
