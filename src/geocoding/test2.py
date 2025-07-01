@@ -9,8 +9,8 @@ import os
 import sys
 
 # 📁 경로 설정
-INPUT_PATH = "data/processed/busstop__processed.csv"
-OUTPUT_PATH = "data/processed/busstop__processed_2.csv"
+INPUT_PATH = "data/processed/bus_stop__processed.csv"
+OUTPUT_PATH = "data/processed/bus_stop__processed_2.csv"
 
 # 📌 sys.path에 src 경로 추가
 sys.path.append(os.path.abspath("src"))

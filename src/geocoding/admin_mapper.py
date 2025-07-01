@@ -72,12 +72,11 @@ mix_df = mix_df.rename(columns={
 
 def get_gu_dong_codes(gu: str, dong: str) -> tuple:
     """
-    자치구명(gu)과 동명(dong)을 입력받아 해당하는 자치구코드(gu_code)와 행정동코드(dong_code)를 반환합니다.
+    자치구명(gu)과 동명(dong)을 입력받아 해당하는 자치구코드(gu_code),
+    행정동코드(dong_code), 행정동명(admin_dong)을 반환합니다.
 
     - 입력된 동명이 이미 행정동인 경우: 직접 조회
     - 법정동인 경우: mix 파일을 통해 행정동으로 매핑 후 코드 조회
-
-    참조: KIKmix.20250701.xlsx
     """
     try:
         # ① 입력된 동명이 행정동인 경우 → 바로 반환
@@ -85,22 +84,24 @@ def get_gu_dong_codes(gu: str, dong: str) -> tuple:
         if not direct.empty:
             dong_code = direct.iloc[0]["admin_code"]
             gu_code = dong_code[:5]
-            return gu_code, dong_code
+            admin_dong = direct.iloc[0]["admin_dong"]
+            return gu_code, dong_code, admin_dong
 
         # ② 법정동일 경우 → 행정동으로 매핑 후 반환
         match = mix_df[(mix_df["gu_name"] == gu) & (mix_df["legal_dong"] == dong)]
         if not match.empty:
             dong_code = match.iloc[0]["admin_code"]
             gu_code = dong_code[:5]
-            return gu_code, dong_code
+            admin_dong = match.iloc[0]["admin_dong"]
+            return gu_code, dong_code, admin_dong
 
         # ③ 실패 시
         print(f"[❌ 매핑 실패] gu={gu}, dong={dong}")
-        return None, None
+        return None, None, None
 
     except Exception as e:
         print(f"[⚠️ 예외 발생] gu={gu}, dong={dong} → {e}")
-        return None, None
+        return None, None, None
 
 
 def smart_parse_gu_and_dong(address: str):
