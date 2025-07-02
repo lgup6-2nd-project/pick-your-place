@@ -64,6 +64,9 @@ Streamlit과 GeoPandas를 활용한 웹 대시보드 상에서 서울시 지도�
 | 버전관리   | [Git](https://git-scm.com) / [GitHub](https://github.com) |
 | 협업 툴    | [Notion](https://www.notion.so) / [draw.io](https://draw.io) |
 
+# 시스템 아키텍쳐
+![archi](assets/SYSTEM_ARCHITECTURE.png)
+
 
 ---
 ## 🧱 데이터 설계
