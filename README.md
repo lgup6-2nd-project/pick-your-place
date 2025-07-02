@@ -51,10 +51,19 @@ Streamlit과 GeoPandas를 활용한 웹 대시보드 상에서 서울시 지도�
 
 ## 🗂️ 사용 기술 스택
 
-- Python (pandas, geopandas, streamlit)
-- SQLite (데이터 저장)
-- VWorld API, 서울 열린데이터광장 등 공공 API
-- Git, draw.io, notion 등 협업 툴
+## 🛠 기술 스택
+
+| 분야       | 기술명                             |
+|------------|--------------------------------------|
+| 언어       | [Python](https://www.python.org)     |
+| 시각화     | [Streamlit](https://streamlit.io)    |
+| 지도처리   | [GeoPandas](https://geopandas.org)   |
+| 데이터 처리| [Pandas](https://pandas.pydata.org) |
+| 데이터베이스 | [SQLite](https://www.sqlite.org)    |
+| 공공 API   | [VWorld](https://www.vworld.kr) / [서울 열린데이터광장](https://data.seoul.go.kr) |
+| 버전관리   | [Git](https://git-scm.com) / [GitHub](https://github.com) |
+| 협업 툴    | [Notion](https://www.notion.so) / [draw.io](https://draw.io) |
+
 
 ---
 ## 🧱 데이터 설계
@@ -81,7 +90,7 @@ Streamlit과 GeoPandas를 활용한 웹 대시보드 상에서 서울시 지도�
 
 - 기능 및 비기능 요구사항 포함
 - 데이터 수집, 정제, 가중치 설정, 지도 시각화, UI 요구사항 등 명세화
-- [요구사항 정의서 보기](링크 또는 별도 PDF 첨부 예정)
+
 
 ---
 
