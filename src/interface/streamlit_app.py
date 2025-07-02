@@ -13,24 +13,24 @@ from model.rule_based_model import load_and_score_counts
 st.set_page_config(layout="wide")
 st.title("서울시 행정동 추천 시스템")
 
-def get_connection():
-    return pymysql.connect(
-        host=os.environ["DB_HOST"],
-        user=os.environ["DB_USER"],
-        password=os.environ["DB_PASSWORD"],
-        database=os.environ["DB_NAME"],
-        charset="utf8mb4"
-    )
+# def get_connection():
+#     return pymysql.connect(
+#         host=os.environ["DB_HOST"],
+#         user=os.environ["DB_USER"],
+#         password=os.environ["DB_PASSWORD"],
+#         database=os.environ["DB_NAME"],
+#         charset="utf8mb4"
+#     )
 
-try:
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SHOW TABLES;")
-    tables = cursor.fetchall()
-    st.success("DB 연결 성공!")
-    st.write("테이블 목록:", tables)
-except Exception as e:
-    st.error(f"DB 연결 실패: {e}")
+# try:
+#     conn = get_connection()
+#     cursor = conn.cursor()
+#     cursor.execute("SHOW TABLES;")
+#     tables = cursor.fetchall()
+#     st.success("DB 연결 성공!")
+#     st.write("테이블 목록:", tables)
+# except Exception as e:
+#     st.error(f"DB 연결 실패: {e}")
 
 # ✅ 카테고리별 변수 매핑
 category_mapping = {
