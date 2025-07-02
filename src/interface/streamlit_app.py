@@ -81,18 +81,18 @@ for cat, vars_in_cat in category_mapping.items():
 button_col = st.columns([6, 1])[1]
 with button_col:
     if st.button("✅ 추천 점수 계산"):
-        with st.spinner("데이터 불러오는 중..."):
-            pass
         with st.spinner("추천 점수 계산 중..."):
             result_df = load_and_score_counts(
-            count_dir="data/processed_counts",
-            processed_dir="data/processed",
-            user_input_scores=weights
+                count_dir="data/processed_counts",
+                processed_dir="data/processed",
+                user_input_scores=weights
             )
 
-            st.session_state["result_df"] = result_df  # ✅ 이 줄 추가!
-            # st.dataframe(result_df)
+            st.session_state["result_df"] = result_df
             st.success("추천 점수 계산 완료!")
+
+# 항상 최신 result_df 사용
+result_df = st.session_state.get("result_df")
 
 if "result_df" not in st.session_state or st.session_state["result_df"] is None:
     st.info("추천 점수는 아직 계산되지 않았습니다. 지도는 빈 점수 기준으로 보여집니다.")
