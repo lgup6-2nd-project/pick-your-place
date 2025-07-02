@@ -77,7 +77,7 @@ Streamlit과 GeoPandas를 활용한 웹 대시보드 상에서 서울시 지도�
 - 주요 항목: 교통, 의료, 교육, 생활편의시설, CCTV, 주거시세 등
 
   # DataBase E-R Diagram
-  - 전처리 된 데이터들에 컬럼들을 PK, FK을 부여
+  - 전처리 된 데이터들의 컬럼들에 PK, FK을 부여
   ![erd](assets/DB_ERD.png)
 
 ### ⚖️ 2) 데이터 가중치 반영
