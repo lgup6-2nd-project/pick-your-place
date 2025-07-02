@@ -200,3 +200,5 @@ db/
 *.geojson
 data/mysql/
 admdongkor-master/
+*.pdf
+*zip
