@@ -76,6 +76,10 @@ Streamlit과 GeoPandas를 활용한 웹 대시보드 상에서 서울시 지도�
 - 서울시 공공데이터 기반 인프라 수집 (CSV, API)
 - 주요 항목: 교통, 의료, 교육, 생활편의시설, CCTV, 주거시세 등
 
+  # DataBase E-R Diagram
+  - 전처리 된 데이터들의 컬럼들을 PK, FK을 부여
+  ![erd](assets/DB_ERD.png)
+
 ### ⚖️ 2) 데이터 가중치 반영
 
 - 사용자 설정에 따라 6가지 인프라 항목별 가중치 입력 가능
