@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> 24a651047851cae8bb5610cfd869db5b5d60c144
 # PICK-YOUR-PLACE
 
 **LG U+ WHY NOT SW CAMP 6기**  
@@ -35,7 +38,7 @@ Streamlit과 GeoPandas를 활용한 웹 대시보드 상에서 서울시 지도�
 ---
 
 ## 👥 팀원 소개  
-(추가 예정)
+
 
 ## 파일구조 예시
 ```text
