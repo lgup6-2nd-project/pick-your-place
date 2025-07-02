@@ -64,19 +64,29 @@ with col3:
     education_weight = st.slider("🏫 교육 인프라", 0, 10, 5)
     housing_weight = st.slider("🏠 주거 정보", 0, 10, 5)
 
-weights = {}
-for cat, vars_in_cat in category_mapping.items():
-    cat_weight = {
-        "transport": transport_weight,
-        "living": living_weight,
-        "medical": medical_weight,
-        "safety": safety_weight,
-        "education": education_weight,
-        "housing": housing_weight,
-    }[cat]
-    for var in vars_in_cat:
-        weights[var] = cat_weight
+# weights = {}
+# for cat, vars_in_cat in category_mapping.items():
+#     cat_weight = {
+#         "transport": transport_weight,
+#         "living": living_weight,
+#         "medical": medical_weight,
+#         "safety": safety_weight,
+#         "education": education_weight,
+#         "housing": housing_weight,
+#     }[cat]
+#     for var in vars_in_cat:
+#         weights[var] = cat_weight
     
+# ✅ 변경: category별 가중치로 직접 넘기기
+weights = {
+    "transport": transport_weight,
+    "living": living_weight,
+    "medical": medical_weight,
+    "safety": safety_weight,
+    "education": education_weight,
+    "housing": housing_weight
+}
+
 # 버튼 우측 정렬
 button_col = st.columns([6, 1])[1]
 with button_col:
